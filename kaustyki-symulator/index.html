@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Symulator Kaustyk - Narzędzie Edukacyjne</title>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>Wizualizacja i Symulacja Kaustyk</h1>
+    <p>Projekt edukacyjny z fizyki i optyki geometrycznej</p>
+  </header>
+
+  <main>
+    <section id="controls">
+      <h2>Parametry symulacji</h2>
+
+      <div class="control-group">
+        <label for="ray-count">Ilość promieni:</label>
+        <input type="range" id="ray-count" min="10" max="1000" value="100">
+        <span id="ray-count-val">100</span>
+      </div>
+
+      <div class="control-group">
+        <label for="ior">Współczynnik załamania (IOR):</label>
+        <input type="range" id="ior" min="1.0" max="2.5" step="0.01" value="1.5">
+        <span id="ior-val">1.50</span>
+      </div>
+    </section>
+
+    <section id="canvas-container">
+      <canvas id="optics-canvas" width="800" height="600"></canvas>
+    </section>
+  </main>
+</div>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
