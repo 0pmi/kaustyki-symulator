@@ -1,51 +1,147 @@
+/* Zmienne dla spójności kolorystycznej */
+:root {
+  --bg-color: #1a1a1a;
+  --panel-bg: #2a2a2a;
+  --canvas-bg: #050505;
+  --text-main: #e0e0e0;
+  --text-muted: #999;
+  --accent-blue: #4a90e2;
+}
+
 body {
   margin: 0;
   font-family: system-ui, -apple-system, sans-serif;
-  background-color: #1a1a1a;
-  color: #e0e0e0;
-  padding: 20px;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  line-height: 1.6;
 }
 
 #app {
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
+  padding: 40px 20px;
 }
 
-header {
-  text-align: center;
-  margin-bottom: 30px;
+/* Typografia */
+h1 { font-size: 2.5rem; margin-bottom: 0.2em; text-align: center; }
+.subtitle { text-align: center; color: var(--text-muted); font-size: 1.2rem; margin-bottom: 40px; }
+h2 { color: var(--accent-blue); border-bottom: 1px solid #333; padding-bottom: 10px; margin-top: 40px;}
+h3 { margin-top: 0; }
+
+/* Bloki na teorię (Placeholdery) */
+.theory-placeholder {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-left: 4px solid var(--accent-blue);
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 0 4px 4px 0;
+  font-style: italic;
+  color: #bbb;
+}
+.caustics-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 kolumny */
+  gap: 15px; /* Odstęp między zdjęciami */
+  margin-top: 20px;
 }
 
-main {
+.gallery-item img {
+  width: 100%;
+  height: 200px; /* Stała wysokość dla wszystkich zdjęć */
+  object-fit: cover; /* Zdjęcie zostanie przycięte tak, by wypełnić obszar bez zniekształceń */
+  border-radius: 8px;
+  transition: transform 0.3s ease; /* Ładny efekt przy najechaniu */
+}
+
+.gallery-item img:hover {
+  transform: scale(1.05); /* Delikatne powiększenie po najechaniu myszką */
+  cursor: pointer;
+}
+
+/* Styl dla lightboxa */
+.lightbox {
+  display: none; /* Ukryty domyślnie */
+  position: fixed;
+  z-index: 1000;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  justify-content: center;
+  align-items: center;
+}
+
+.lightbox img {
+  max-width: 90%;
+  max-height: 80%;
+  border-radius: 4px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+.close-lightbox {
+  position: absolute;
+  top: 20px; right: 30px;
+  color: white; font-size: 40px; cursor: pointer;
+}
+
+
+/* Układ Symulatora */
+.simulator-container {
   display: flex;
-  flex-direction: column;
   gap: 20px;
+  margin: 30px 0;
+  flex-wrap: wrap; /* Zwijanie na małych ekranach */
 }
 
-#controls {
-  background: #2a2a2a;
+.controls-panel {
+  background: var(--panel-bg);
   padding: 20px;
   border-radius: 8px;
+  flex: 1;
+  min-width: 250px;
 }
 
-.control-group {
-  margin-bottom: 15px;
-}
-
-.control-group label {
-  display: block;
-  margin-bottom: 5px;
-}
-
-#canvas-container {
+.canvas-panel {
+  flex: 3;
   display: flex;
   justify-content: center;
-  background: #111;
+  background: var(--canvas-bg);
   border-radius: 8px;
-  padding: 10px;
+  border: 1px solid #333;
+  overflow: hidden;
 }
 
 canvas {
-  border: 1px solid #333;
-  background-color: #050505;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Kontrolki suwaków */
+.control-group { margin-bottom: 20px; }
+.control-group label { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: bold; }
+input[type="range"] { width: 100%; accent-color: var(--accent-blue); }
+
+/* Tabelka IOR */
+.ior-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 30px;
+  font-size: 0.9rem;
+}
+
+.ior-table th, .ior-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid #444;
+}
+
+.ior-table th { color: var(--accent-blue); font-weight: bold; }
+.ior-table tr:hover { background-color: rgba(255,255,255,0.05); }
+
+footer {
+  text-align: center;
+  margin-top: 80px;
+  padding-top: 20px;
+  border-top: 1px solid #333;
+  color: var(--text-muted);
 }
