@@ -2,144 +2,144 @@
 <html lang="pl">
 <head>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-          onload="renderMathInElement(document.body, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}] });">
-  </script>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Encyklopedia Kaustyk</title>
-  <script type="module" crossorigin src="/kaustyki-symulator/assets/index-3c1HnHnQ.js"></script>
-  <link rel="stylesheet" crossorigin href="/kaustyki-symulator/assets/index-BvXuU_VS.css">
+  <title data-i18n="meta.title">Encyklopedia Kaustyk</title>
+  <script type="module" crossorigin src="/kaustyki-symulator/assets/index-BPRtAZD9.js"></script>
+  <link rel="stylesheet" crossorigin href="/kaustyki-symulator/assets/index-CO4U6fcC.css">
 </head>
 <body>
 <div id="app">
   <header id="intro">
-    <h1>Optyka i Kaustyki</h1>
-    <p class="subtitle">Interaktywne Laboratorium Optyczne</p>
+    <h1 data-i18n="intro.title"></h1>
+    <p class="subtitle" data-i18n="intro.subtitle"></p>
 
     <div class="theory-placeholder">
       <section id="gallery" class="content-section">
-        <h2>Inspiracje: Kaustyki w naturze</h2>
+        <h2 data-i18n="intro.galleryTitle"></h2>
         <div class="caustics-gallery">
-          <div class="gallery-item"><img src="/kaustyki-symulator/assets/kaustyki-1-QRybhwBN.jpg" alt="Kaustyka 1"></div>
-          <div class="gallery-item"><img src="/kaustyki-symulator/assets/kaustyki-2-By_okBUD.jpg" alt="Kaustyka 2"></div>
-          <div class="gallery-item"><img src="/kaustyki-symulator/assets/kaustyki-3-RL8YtTBh.jpg" alt="Kaustyka 3"></div>
-          <div class="gallery-item"><img src="/kaustyki-symulator/assets/kaustyki-4-CtVVRNk7.jpg" alt="Kaustyka 4"></div>
-          <div class="gallery-item"><img src="/kaustyki-symulator/assets/kaustyki-5-Cg1CQpDp.jpg" alt="Kaustyka 5"></div>
-          <div class="gallery-item"><img src="/kaustyki-symulator/assets/kaustyki-6-CG-yCZ4O.jpg" alt="Kaustyka 6"></div>
-          <div class="gallery-item"><img src="/kaustyki-symulator/assets/kaustyki-7-D4gGXmRJ.jpg" alt="Kaustyki 7"></div>
-          <div class="gallery-item"><img src="/kaustyki-symulator/assets/kaustyki-8-CCjAOj8R.jpg" alt="Kaustyki 8"></div>
-          <div class="gallery-item"><img src="/kaustyki-symulator/assets/kaustyki-9-DloTy3V7.jpg" alt="Kaustyki 9"></div>
+          <div class="gallery-item"><img src="/kaustyki-symulator/assets/images/kaustyki-1.jpg" alt="Kaustyka 1"></div>
+          <div class="gallery-item"><img src="/kaustyki-symulator/assets/images/kaustyki-2.jpg" alt="Kaustyka 2"></div>
+          <div class="gallery-item"><img src="/kaustyki-symulator/assets/images/kaustyki-3.jpg" alt="Kaustyka 3"></div>
+          <div class="gallery-item"><img src="/kaustyki-symulator/assets/images/kaustyki-4.jpg" alt="Kaustyka 4"></div>
+          <div class="gallery-item"><img src="/kaustyki-symulator/assets/images/kaustyki-5.jpg" alt="Kaustyka 5"></div>
+          <div class="gallery-item"><img src="/kaustyki-symulator/assets/images/kaustyki-6.jpg" alt="Kaustyka 6"></div>
+          <div class="gallery-item"><img src="/kaustyki-symulator/assets/images/kaustyki-7.jpg" alt="Kaustyki 7"></div>
+          <div class="gallery-item"><img src="/kaustyki-symulator/assets/images/kaustyki-8.jpg" alt="Kaustyki 8"></div>
+          <div class="gallery-item"><img src="/kaustyki-symulator/assets/images/kaustyki-9.jpg" alt="Kaustyki 9"></div>
         </div>
         <p style="font-size: 0.8rem; margin-top: 10px; color: #666;">
-          Źródło zdjęć: <a href="https://nickyskye.blogspot.com/2016/05/webs-of-light-on-and-in-water.html" target="_blank">Nicky Skye</a>
+          <span data-i18n="intro.gallerySource"></span> <a href="https://nickyskye.blogspot.com/2016/05/webs-of-light-on-and-in-water.html" target="_blank">Nicky Skye</a>
         </p>
       </section>
     </div>
 
-    <div class="theory-placeholder" style="border-left-color: #f1c40f;">
-      <strong>Czym właściwie jest kaustyka?</strong> Wbrew pozorom nie jest to żaden fizyczny obiekt, a raczej świetlna "architektura". Z języka greckiego <em>kaustikos</em> oznacza "palący". To zjawisko optyczne polegające na powstawaniu jasnych, ostrych wzorów z zagęszczonych promieni świetlnych. Powstają one, gdy światło załamuje się lub odbija od zakrzywionych powierzchni, krzyżując się i kumulując energię w charakterystycznych obwiedniach.
-    </div>
-
+    <div class="theory-placeholder" style="border-left-color: #f1c40f;" data-i18n="intro.whatIsCaustic"></div>
   </header>
 
   <main>
     <section id="snell" class="content-section interactive">
-      <h2>1. Załamanie (Prawo Snella)</h2>
-      <div class="theory-placeholder">
-        <p>Zanim zrozumiemy skomplikowane kaustyki, musimy zacząć od podstawy optyki geometrycznej. Kiedy światło przechodzi z jednego ośrodka do drugiego (np. z powietrza do szkła), zmienia swoją prędkość i kierunek. Decyduje o tym współczynnik załamania światła $n$ (z ang. <em>Index of Refraction - IOR</em>).</p>
-        <p>Matematycznie to zjawisko opisuje <strong>Prawo Snella</strong>:</p>
-        $$n_1 \sin(\theta_1) = n_2 \sin(\theta_2)$$
-        <p>Gdzie $n_1$ i $n_2$ to współczynniki załamania obu ośrodków, a $\theta_1$ i $\theta_2$ to kąty padania i załamania mierzone względem osi normalnej (prostopadłej do powierzchni granicznej).</p>
-      </div>
+      <h2 data-i18n="snell.title"></h2>
+      <div class="theory-placeholder" data-i18n="snell.theory"></div>
 
       <div class="simulator-container">
         <div class="controls-panel">
-          <h3>Parametry ośrodków</h3>
+          <h3 data-i18n="snell.controls.title"></h3>
 
           <div class="control-group">
-            <label for="snell-angle">Kąt padania ($\theta_1$): <span id="snell-angle-val">45</span>&deg;</label>
+            <label for="snell-angle">
+              <span data-i18n="snell.controls.angle"></span>
+              <span><span id="snell-angle-val">45</span>&deg;</span>
+            </label>
             <input type="range" id="snell-angle" min="-85" max="85" value="45">
           </div>
 
           <div class="control-group">
-            <label for="snell-ior1">Ośrodek Górny ($n_1$): <span id="snell-ior1-val">1.00</span></label>
+            <label for="snell-ior1">
+              <span data-i18n="snell.controls.ior1"></span>
+              <span id="snell-ior1-val">1.00</span>
+            </label>
             <input type="range" id="snell-ior1" min="1.0" max="2.5" step="0.01" value="1.00">
           </div>
 
           <div class="control-group">
-            <label for="snell-ior2">Ośrodek Dolny ($n_2$): <span id="snell-ior2-val">1.52</span></label>
+            <label for="snell-ior2">
+              <span data-i18n="snell.controls.ior2"></span>
+              <span id="snell-ior2-val">1.52</span>
+            </label>
             <input type="range" id="snell-ior2" min="1.0" max="2.5" step="0.01" value="1.52">
           </div>
 
           <table class="ior-table" style="margin-top: 15px; width: 100%; border-collapse: collapse; font-size: 0.85rem;">
-            <thead><tr style="border-bottom: 1px solid #444;"><th style="text-align: left; padding: 5px;">Materiał</th><th style="text-align: right; padding: 5px;">Współczynnik (IOR)</th></tr></thead>
+            <thead><tr style="border-bottom: 1px solid #444;"><th style="text-align: left; padding: 5px;" data-i18n="snell.table.mat"></th><th style="text-align: right; padding: 5px;" data-i18n="snell.table.ior"></th></tr></thead>
             <tbody>
-            <tr><td style="padding: 3px 5px;">Próżnia / Powietrze</td><td style="text-align: right; padding: 3px 5px;">1.00</td></tr>
-            <tr><td style="padding: 3px 5px;">Lód</td><td style="text-align: right; padding: 3px 5px;">1.31</td></tr>
-            <tr><td style="padding: 3px 5px;">Woda</td><td style="text-align: right; padding: 3px 5px;">1.33</td></tr>
-            <tr><td style="padding: 3px 5px;">Szkło Crown (Typowe)</td><td style="text-align: right; padding: 3px 5px;">1.52</td></tr>
-            <tr><td style="padding: 3px 5px;">Szkło Flint (Gęste)</td><td style="text-align: right; padding: 3px 5px;">1.62</td></tr>
-            <tr><td style="padding: 3px 5px;">Diament</td><td style="text-align: right; padding: 3px 5px;">2.42</td></tr>
+            <tr><td style="padding: 3px 5px;" data-i18n="snell.table.v1"></td><td style="text-align: right; padding: 3px 5px;">1.00</td></tr>
+            <tr><td style="padding: 3px 5px;" data-i18n="snell.table.v2"></td><td style="text-align: right; padding: 3px 5px;">1.31</td></tr>
+            <tr><td style="padding: 3px 5px;" data-i18n="snell.table.v3"></td><td style="text-align: right; padding: 3px 5px;">1.33</td></tr>
+            <tr><td style="padding: 3px 5px;" data-i18n="snell.table.v4"></td><td style="text-align: right; padding: 3px 5px;">1.52</td></tr>
+            <tr><td style="padding: 3px 5px;" data-i18n="snell.table.v5"></td><td style="text-align: right; padding: 3px 5px;">1.62</td></tr>
+            <tr><td style="padding: 3px 5px;" data-i18n="snell.table.v6"></td><td style="text-align: right; padding: 3px 5px;">2.42</td></tr>
             </tbody>
           </table>
-
         </div>
-
         <div class="canvas-panel">
           <canvas id="canvas-snell" width="800" height="500"></canvas>
         </div>
-
       </div>
       <div class="simulator-description" style="background: rgba(74, 144, 226, 0.1); padding: 15px; border-radius: 6px; margin-top: 20px; font-size: 0.9rem;">
-        <h4 style="margin-top: 0; color: #4a90e2;">📐 Analiza Modelu: Załamanie i Odbicie Wewnętrzne</h4>
-        <ul style="padding-left: 20px; margin-bottom: 0;">
-          <li><strong>Zjawisko:</strong> Pojedynczy promień światła przechodzi przez płaską granicę dwóch ośrodków. Kąty liczone są od pionowej, przerywanej linii (normalnej).</li>
-          <li><strong>Działanie modelu:</strong> Zmieniając współczynniki obu ośrodków można badać, jak gęstość optyczna wpływa na kierunek promienia. Jeśli światło przechodzi z ośrodka rzadszego do gęstszego (np. powietrze -> szkło), promień "przygina się" do normalnej.</li>
-          <li><strong>Całkowite Odbicie Wewnętrzne (TIR):</strong> Ustaw Ośrodek Górny na gęstszy (np. 1.52), a Dolny na rzadszy (1.00). Zwiększając kąt padania, w pewnym momencie promień nie będzie w stanie wejść do dolnego ośrodka i w 100% odbije się od granicy jak od idealnego lustra. Na tym zjawisku opiera się działanie światłowodów!</li>
-        </ul>
+        <h4 style="margin-top: 0; color: #4a90e2;" data-i18n="snell.descTitle"></h4>
+        <div data-i18n="snell.descList"></div>
       </div>
     </section>
 
     <section id="spherical-aberration" class="content-section interactive">
-      <h2>2. Skupienie (Soczewka)</h2>
-      <div class="theory-placeholder">
-        <p>W uproszczonej, szkolnej fizyce uczymy się, że soczewki skupiają wszystkie promienie w jednym, idealnym punkcie zwanym ogniskiem. Rzeczywistość jest jednak inna. Soczewki sferyczne (o przekroju opartym na geometrii koła) cierpią na wadę zwaną <strong>aberracją sferyczną</strong>.</p>
-        <p>Promienie brzeżne, biegnące dalej od osi optycznej, padają na soczewkę pod większym kątem i zgodnie z prawem Snella załamują się znacznie silniej niż promienie blisko środka. Zamiast jednego ogniska powstaje rozmyty obszar, a przecinające się promienie tworzą jasną obwiednię – to właśnie nasza pierwsza kaustyka załamania.</p>
-      </div>
+      <h2 data-i18n="lens.title"></h2>
+      <div class="theory-placeholder" data-i18n="lens.theory"></div>
 
       <div class="simulator-container">
         <div class="controls-panel">
-          <h3>Parametry symulacji</h3>
+          <h3 data-i18n="lens.controls.title"></h3>
 
           <div class="control-group">
-            <label for="light-y">Pozycja światła Y:</label>
+            <label for="light-y">
+              <span data-i18n="lens.controls.lightY"></span>
+            </label>
             <input type="range" id="light-y" min="100" max="500" value="300">
           </div>
 
           <div class="control-group">
-            <label for="ray-count">Ilość promieni: <span id="ray-count-val">15</span></label>
+            <label for="ray-count">
+              <span data-i18n="lens.controls.rayCount"></span>
+              <span id="ray-count-val">15</span>
+            </label>
             <input type="range" id="ray-count" min="15" max="500" value="15">
           </div>
 
           <div class="control-group">
-            <label for="ior">Współczynnik załamania (IOR): <span id="ior-val">1.52</span></label>
+            <label for="ior">
+              <span data-i18n="lens.controls.ior"></span>
+              <span id="ior-val">1.52</span>
+            </label>
             <input type="range" id="ior" min="1.0" max="2.5" step="0.01" value="1.52">
           </div>
 
-          <table class="ior-table">
-            <thead>
-            <tr><th>Materiał</th><th>Wartość IOR</th></tr>
-            </thead>
+          <table class="ior-table" style="margin-top: 15px; width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+            <thead><tr style="border-bottom: 1px solid #444;"><th style="text-align: left; padding: 5px;" data-i18n="lens.table.mat"></th><th style="text-align: right; padding: 5px;" data-i18n="lens.table.ior"></th></tr></thead>
             <tbody>
-            <tr><td>Powietrze</td><td>1.00</td></tr>
-            <tr><td>Woda</td><td>1.33</td></tr>
-            <tr><td>Oliwa z oliwek</td><td>1.47</td></tr>
-            <tr><td>Szkło (Crown)</td><td>1.52</td></tr>
-            <tr><td>Szafir</td><td>1.77</td></tr>
-            <tr><td>Diament</td><td>2.42</td></tr>
+            <tr><td style="padding: 3px 5px;" data-i18n="lens.table.v1"></td><td style="text-align: right; padding: 3px 5px;">1.00</td></tr>
+            <tr><td style="padding: 3px 5px;" data-i18n="lens.table.v2"></td><td style="text-align: right; padding: 3px 5px;">1.33</td></tr>
+            <tr><td style="padding: 3px 5px;" data-i18n="lens.table.v3"></td><td style="text-align: right; padding: 3px 5px;">1.47</td></tr>
+            <tr><td style="padding: 3px 5px;" data-i18n="lens.table.v4"></td><td style="text-align: right; padding: 3px 5px;">1.52</td></tr>
+            <tr><td style="padding: 3px 5px;" data-i18n="lens.table.v5"></td><td style="text-align: right; padding: 3px 5px;">1.77</td></tr>
+            <tr><td style="padding: 3px 5px;" data-i18n="lens.table.v6"></td><td style="text-align: right; padding: 3px 5px;">2.42</td></tr>
             </tbody>
           </table>
         </div>
@@ -147,125 +147,103 @@
         <div class="canvas-panel">
           <canvas id="canvas-lens" width="800" height="600"></canvas>
         </div>
-        <div class="simulator-description" style="background: rgba(74, 144, 226, 0.1); padding: 15px; border-radius: 6px; margin-top: 20px; font-size: 0.9rem;">
-          <h4 style="margin-top: 0; color: #4a90e2;">🔍 Analiza Modelu: Załamanie w Soczewce</h4>
-          <ul style="padding-left: 20px; margin-bottom: 0;">
-            <li><strong>Zjawisko:</strong> Symulator prezentuje aberrację sferyczną. Zwróć uwagę, że promienie na krawędziach soczewki załamują się pod ostrzejszym kątem niż te blisko środka, tworząc jasną obwiednię kaustyki zamiast jednego, idealnego punktu (ogniska).</li>
-            <li><strong>Jak używać:</strong> Zmieniaj kąt padania światła, aby zobaczyć, jak ognisko i kształt kaustyki przemieszczają się i deformują. Regulacja IOR pokaże Ci różnicę między słabą soczewką (np. woda) a silną (np. diament).</li>
-            <li><strong>Uproszczenia modelu:</strong> Model zakłada wyidealizowaną, nieskończenie gładką soczewkę w przestrzeni 2D. Użyto w nim światła monochromatycznego (jednobarwnego) – w rzeczywistości światło białe uległoby tu dodatkowo dyspersji (aberracji chromatycznej), rozmywając kaustykę w tęczę.</li>
-          </ul>
-        </div>
+      </div>
+      <div class="simulator-description" style="background: rgba(74, 144, 226, 0.1); padding: 15px; border-radius: 6px; margin-top: 20px; font-size: 0.9rem;">
+        <h4 style="margin-top: 0; color: #4a90e2;" data-i18n="lens.descTitle"></h4>
+        <div data-i18n="lens.descList"></div>
       </div>
     </section>
 
     <section id="reflection-caustic" class="content-section interactive">
-      <h2>3. Odbicie (Nefroida)</h2>
-      <div class="theory-placeholder">
-        <p>Kaustyki powstają nie tylko przez załamanie, ale też przez odbicie (refleksję). Zjawisko to opisuje prosta zasada: kąt padania jest równy kątowi odbicia. W grafice komputerowej promień odbity $\vec{R}$ wyliczamy za pomocą wektora wchodzącego $\vec{D}$ i wektora normalnego powierzchni $\vec{n}$:</p>
-        $$\vec{R} = \vec{D} - 2(\vec{D} \cdot \vec{n})\vec{n}$$
-        <p>Gdzie symbol $\cdot$ oznacza iloczyn skalarny wektorów. Klasycznym przykładem kaustyki odbiciowej jest wzór przypominający serce w kubku kawy. Promienie uderzając o lustrzane wnętrze kubka, tworzą na płynie matematyczną krzywą zwaną nefroidą (potocznie krzywą nerkową, będącą odmianą epicykloidy).</p>
-      </div>
+      <h2 data-i18n="cup.title"></h2>
+      <div class="theory-placeholder" data-i18n="cup.theory"></div>
 
       <div class="simulator-container">
         <div class="controls-panel">
-          <h3>Parametry odbicia</h3>
+          <h3 data-i18n="cup.controls.title"></h3>
 
           <div class="control-group">
-            <label for="reflect-light-x">Pozycja światła X: <span id="reflect-light-x-val">250</span></label>
+            <label for="reflect-light-x">
+              <span data-i18n="cup.controls.lightX"></span>
+              <span id="reflect-light-x-val">250</span>
+            </label>
             <input type="range" id="reflect-light-x" min="30" max="470" value="250">
           </div>
 
           <div class="control-group">
-            <label for="reflect-ray-count">Ilość promieni: <span id="reflect-ray-count-val">5</span></label>
+            <label for="reflect-ray-count">
+              <span data-i18n="cup.controls.rayCount"></span>
+              <span id="reflect-ray-count-val">5</span>
+            </label>
             <input type="range" id="reflect-ray-count" min="5" max="1000" value="5">
           </div>
 
-          <div class="theory-placeholder" style="font-size: 0.85rem; margin-top: 20px;">
-            [Wskazówka dydaktyczna: Zmieniaj liczbę promieni by zaobserwować jak niektóre z nich pokrywają się lub przecinają w konkretnych miejscach. Najjaśniejsze punkty to miejsca, w których liczba promieni jest największa, wynikiem czego są charakterystyczne kształty na dnie szklanki.]
-          </div>
+          <div class="theory-placeholder" style="font-size: 0.85rem; margin-top: 20px;" data-i18n="cup.tip"></div>
         </div>
 
         <div class="canvas-panel">
           <canvas id="canvas-cup" width="800" height="600"></canvas>
         </div>
-        <div class="simulator-description" style="background: rgba(74, 144, 226, 0.1); padding: 15px; border-radius: 6px; margin-top: 20px; font-size: 0.9rem;">
-          <h4 style="margin-top: 0; color: #4a90e2;">☕ Analiza Modelu: Odbicie w Cylindrze</h4>
-          <ul style="padding-left: 20px; margin-bottom: 0;">
-            <li><strong>Zjawisko:</strong> Równoległe promienie świetlne wpadają do cylindrycznego naczynia. Zamiast skupiać się w jednym punkcie, po odbiciu od wewnętrznej krzywizny krzyżują się, formując wyraźną, jasną krawędź – kaustykę odbiciową w kształcie nefroidy.</li>
-            <li><strong>Działanie modelu:</strong> Zmiana wartości na suwaku symuluje obrót wektora kierunkowego promieni słonecznych (np. wędrówkę słońca po niebie). Promienie startują z zewnątrz, przenikają przez przednią ściankę naczynia i ulegają odbiciu dopiero przy kontakcie z wklęsłą, tylną powierzchnią lustrzaną.</li>
-            <li><strong>Uproszczenia modelu:</strong> Symulacja odbywa się w płaskim rzucie 2D. Założono idealnie zwierciadlaną ściankę wewnętrzną oraz pominięto zjawisko załamania światła na granicy powietrze-płyn. W rzeczywistości zawsze występuje częściowe rozproszenie światła, przez co obserwowana kaustyka ma nieco bardziej miękkie kontury.</li>
-          </ul>
-        </div>
+      </div>
+      <div class="simulator-description" style="background: rgba(74, 144, 226, 0.1); padding: 15px; border-radius: 6px; margin-top: 20px; font-size: 0.9rem;">
+        <h4 style="margin-top: 0; color: #4a90e2;" data-i18n="cup.descTitle"></h4>
+        <div data-i18n="cup.descList"></div>
       </div>
     </section>
 
     <section id="dispersion" class="content-section interactive">
-      <h2>4. Dyspersja (Tęcza)</h2>
-
-      <div class="theory-placeholder">
-        <p>Aby zrozumieć tęczę, musimy poznać zjawisko <strong>dyspersji</strong>. Współczynnik załamania światła $n$ zależy od długości fali światła $\lambda$. Krótsze fale (fioletowe) załamują się silniej niż fale długie (czerwone).</p>
-        <p>Zależność tę przybliża empiryczne <strong>Równanie Cauchy'ego</strong>:</p>
-        $$n(\lambda) = A + \frac{B}{\lambda^2}$$
-        <p>W kropli deszczu światło słoneczne wnika do środka (rozszczepiając się), odbija się od tylnej ścianki i wychodzi, tworząc kaustykę pod kątem około $42^\circ$. To ona tworzy widoczny na niebie łuk tęczy!</p>
-      </div>
-
+      <h2 data-i18n="prism.title"></h2>
+      <div class="theory-placeholder" data-i18n="prism.theory"></div>
 
       <div class="simulator-container">
         <div class="controls-panel">
-          <h3>Parametry dyspersji</h3>
+          <h3 data-i18n="prism.controls.title"></h3>
 
           <div class="control-group">
-            <label for="prism-ray-count">Ilość promieni: <span id="prism-ray-count-val">1</span></label>
+            <label for="prism-ray-count">
+              <span data-i18n="prism.controls.rayCount"></span>
+              <span id="prism-ray-count-val">1</span>
+            </label>
             <input type="range" id="prism-ray-count" min="1" max="300" value="1">
           </div>
 
           <div class="control-group">
-            <label for="prism-angle">Kąt padania światła:</label>
+            <label for="prism-angle">
+              <span data-i18n="prism.controls.angle"></span>
+            </label>
             <input type="range" id="prism-angle" min="-20" max="20" value="-5">
           </div>
 
           <div class="control-group">
-            <label>Ośrodek: <strong>Woda (Kropla deszczu)</strong></label>
-            <p style="font-size: 0.85rem; color: #999; margin-top: 5px;">
-              Współczynnik załamania dla wody nie jest jedną liczbą. Zmienia się od 1.331 (dla światła czerwonego) do 1.343 (dla światła fioletowego). To właśnie ta minimalna różnica tworzy tęczę!
-            </p>
+            <label data-i18n="prism.controls.medium"></label>
+            <p style="font-size: 0.85rem; color: #999; margin-top: 5px;" data-i18n="prism.controls.mediumDesc"></p>
           </div>
 
-          <div class="theory-placeholder" style="font-size: 0.85rem; margin-top: 20px;">
-            [Wskazówka dydaktyczna: Zmieniając ilość wyświetlanych promieni zauważ jak rozszczepione kolory kumulują się w wąskim paśmie tworząc kolory tęczy, a w pozostałych miejscach mieszają, tworząc światło białe.]
-          </div>
+          <div class="theory-placeholder" style="font-size: 0.85rem; margin-top: 20px;" data-i18n="prism.tip"></div>
         </div>
 
         <div class="canvas-panel">
           <canvas id="canvas-prism" width="800" height="600"></canvas>
         </div>
-        <div class="simulator-description" style="background: rgba(74, 144, 226, 0.1); padding: 15px; border-radius: 6px; margin-top: 20px; font-size: 0.9rem;">
-          <h4 style="margin-top: 0; color: #4a90e2;">💧 Analiza Modelu: Tęcza Pierwotna w Kropli</h4>
-          <ul style="padding-left: 20px; margin-bottom: 0;">
-            <li><strong>Zjawisko:</strong> Światło wchodzi do wnętrza kropli (1. załamanie i rozszczepienie), odbija się całkowicie od jej tylnej ścianki, a następnie wychodzi na zewnątrz (2. załamanie). Na dole ekranu widać zagęszczony, ułożony kątowo wachlarz kolorów – to on jest powodem powstawania tęczy na niebie.</li>
-            <li><strong>Jak używać:</strong> Zwiększ ilość promieni na maksa. Zwróć uwagę, że tylko wąski zakres promieni wchodzących (tzw. strefa uderzenia Kartezjusza na wysokości około 60-95% promienia kropli) tworzy jasny, użyteczny strumień tęczy. Reszta tworzy rozproszone białe tło we wnętrzu łuku.</li>
-            <li><strong>Uproszczenia modelu:</strong> Prawdziwa różnica IOR dla wody między barwą czerwoną a fioletową to zaledwie ~0.012, co daje różnicę kąta wyjścia wielkości zaledwie 2 stopni. W prezentowanym modelu sztucznie rozciągnięto tę różnicę, aby zjawisko separacji barw było wyraźnie czytelne na ekranie monitora.</li>
-          </ul>
-        </div>
+      </div>
+      <div class="simulator-description" style="background: rgba(74, 144, 226, 0.1); padding: 15px; border-radius: 6px; margin-top: 20px; font-size: 0.9rem;">
+        <h4 style="margin-top: 0; color: #4a90e2;" data-i18n="prism.descTitle"></h4>
+        <div data-i18n="prism.descList"></div>
       </div>
     </section>
 
-
-
     <section id="gpu-gallery" class="content-section">
-      <h2>5. Oświetlenie Globalne (Symulacja 3D)</h2>
-      <div class="theory-placeholder">
-        W przeciwieństwie do naszych analitycznych modeli 2D, nowoczesne silniki graficzne używają potężnych kart graficznych (GPU), aby symulować miliony promieni jednocześnie.
-      </div>
-
+      <h2 data-i18n="gpu.title"></h2>
+      <div class="theory-placeholder" data-i18n="gpu.theory"></div>
       <div id="three-container" style="width: 100%; height: 500px; border-radius: 8px; overflow: hidden; background: #000;"></div>
     </section>
   </main>
 
-  <footer>
-    <p>Stworzone w ramach projektu z Fizyki. Licencja MIT.</p>
+  <footer style="text-align: center; color: #666; margin-top: 40px; font-size: 0.9rem;">
+    <p data-i18n="footer"></p>
   </footer>
 </div>
+
 
 <div id="lightbox" class="lightbox">
   <span class="close-lightbox">&times;</span>
