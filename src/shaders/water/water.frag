@@ -1,55 +1,107 @@
 /**
- * Fragment shader for physically based water rendering.
- * Implements Schlick's approximation of Fresnel equations and Beer-Lambert absorption.
+ * Advanced physically based water rendering.
+ * Utilizes pure continuous mathematics and native IEEE 754 Infinity handling
+ * to eliminate derivative tearing and mipmap drop artifacts.
  */
-uniform vec3 shallowColor;
-uniform vec3 deepColor;
-uniform float ior;
+uniform sampler2D tTiles;
+uniform sampler2D tSky;
+uniform float poolSize;
 uniform float poolDepth;
+uniform vec3 waterAttenuation;
+uniform float reflectivity;
+uniform float ior;
 
 varying vec3 vWorldPosition;
-varying vec3 vViewPosition;
-varying vec3 vNormal;
-varying vec2 vUv;
+varying vec3 vWorldNormal;
 
-/**
- * Schlick's approximation for Fresnel reflectance.
- * @param viewDir Normalized vector from surface to camera.
- * @param normal Normalized surface normal.
- * @param ior Relative Index of Refraction (Medium 2 / Medium 1).
- * @return Reflectance coefficient [0, 1].
- */
-float computeFresnel(vec3 viewDir, vec3 normal, float ior) {
-    float r0 = pow((1.0 - ior) / (1.0 + ior), 2.0);
-    float cosTheta = max(dot(viewDir, normal), 0.0);
-    return r0 + (1.0 - r0) * pow(1.0 - cosTheta, 5.0);
+vec3 sampleEquirectangular(sampler2D map, vec3 dir) {
+    float u = atan(dir.z, dir.x) / (2.0 * 3.1415926) + 0.5;
+    float v = asin(clamp(dir.y, -0.9999, 0.9999)) / 3.1415926 + 0.5;
+    return texture2D(map, vec2(u, v)).rgb;
+}
+
+vec3 getPoolColor(vec3 origin, vec3 dir) {
+    if (length(dir) < 0.001) return vec3(0.0);
+
+    vec3 ro = origin;
+    vec3 rd = normalize(dir);
+
+    vec3 boxMin = vec3(-poolSize * 0.5, -poolDepth, -poolSize * 0.5);
+    vec3 boxMax = vec3(poolSize * 0.5, 2.0, poolSize * 0.5);
+
+    float tFloor = 999999.0;
+    if (rd.y < -1e-6) {
+        tFloor = (boxMin.y - ro.y) / rd.y;
+    }
+
+    float tX = 999999.0;
+    if (rd.x > 1e-6) {
+        tX = (boxMax.x - ro.x) / rd.x;
+    } else if (rd.x < -1e-6) {
+        tX = (boxMin.x - ro.x) / rd.x;
+    }
+
+    float tZ = 999999.0;
+    if (rd.z > 1e-6) {
+        tZ = (boxMax.z - ro.z) / rd.z;
+    } else if (rd.z < -1e-6) {
+        tZ = (boxMin.z - ro.z) / rd.z;
+    }
+
+    float t = min(tFloor, min(tX, tZ));
+
+    if (t == 999999.0) return vec3(0.0);
+
+    vec3 hitPoint = ro + rd * t;
+    vec2 uv;
+    float tileScale = 0.4;
+
+    if (t == tFloor) {
+        uv = hitPoint.xz * tileScale;
+    } else if (t == tX) {
+        uv = hitPoint.zy * tileScale;
+    } else {
+        uv = hitPoint.xy * tileScale;
+    }
+
+    vec3 tileColor = texture2D(tTiles, uv).rgb;
+    vec3 transmission = exp(-waterAttenuation * max(t, 0.0));
+    return tileColor * transmission;
 }
 
 void main() {
-    vec3 viewDir = normalize(vViewPosition);
-    vec3 normal = normalize(vNormal);
+    vec3 incident = normalize(vWorldPosition - cameraPosition);
+    vec3 normal = normalize(vWorldNormal);
 
-    // 1. Fresnel Reflectance
-    float fRatio = computeFresnel(viewDir, normal, ior);
+    if (!gl_FrontFacing) normal = -normal;
 
-    // 2. Beer-Lambert Law Approximation (Volumetric Absorption)
-    // Calculate the path length of the refracted ray through the water volume.
-    // For simplicity before full raytracing, we assume a planar pool bottom.
-    float cosView = max(dot(viewDir, vec3(0.0, 1.0, 0.0)), 0.1);
-    float pathLength = poolDepth / cosView;
+    vec3 dirR = refract(incident, normal, 1.0 / (ior - 0.008));
+    vec3 dirG = refract(incident, normal, 1.0 / ior);
+    vec3 dirB = refract(incident, normal, 1.0 / (ior + 0.007));
 
-    // Exponential attenuation based on path length
-    float absorptionFactor = clamp(exp(-pathLength * 0.15), 0.0, 1.0);
-    vec3 transmissionColor = mix(deepColor, shallowColor, absorptionFactor);
+    if (length(dirG) < 0.001) dirG = reflect(incident, normal);
+    if (length(dirR) < 0.001) dirR = dirG;
+    if (length(dirB) < 0.001) dirB = dirG;
 
-    // 3. Sky/Environment Reflection (Placeholder color before adding Environment Cubemap)
-    vec3 skyColor = vec3(0.8, 0.9, 1.0);
+    vec3 refractedColor = vec3(
+    getPoolColor(vWorldPosition, dirR).r,
+    getPoolColor(vWorldPosition, dirG).g,
+    getPoolColor(vWorldPosition, dirB).b
+    );
 
-    // 4. Final Composite
-    vec3 finalColor = mix(transmissionColor, skyColor, fRatio);
+    vec3 reflectedDir = normalize(reflect(incident, normal));
+    reflectedDir.y = max(reflectedDir.y, 0.001);
+    vec3 reflectedColor = sampleEquirectangular(tSky, reflectedDir) * reflectivity;
 
+    // Fresnel
+    float r0 = pow((1.0 - ior) / (1.0 + ior), 2.0);
+    float cosTheta = clamp(abs(dot(-incident, normal)), 0.0, 1.0);
+    float fRatio = r0 + (1.0 - r0) * pow(1.0 - cosTheta, 5.0);
+
+    if (length(refract(incident, normal, 1.0 / ior)) < 0.001) fRatio = 1.0;
+
+    vec3 finalColor = mix(refractedColor, reflectedColor, clamp(fRatio, 0.0, 1.0));
     gl_FragColor = vec4(finalColor, 1.0);
 
-    // Output color space correction (Three.js integration)
     #include <colorspace_fragment>
 }

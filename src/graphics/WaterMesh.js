@@ -40,16 +40,18 @@ export default class WaterMesh {
             uniforms: {
                 tHeightMap: { value: null },
                 tNormalMap: { value: null },
-                shallowColor: { value: new THREE.Color('#4CA1AF') },
-                deepColor: { value: new THREE.Color('#2C3E50') },
-                ior: { value: 1.333 }, // Standard IOR for water
-                poolDepth: { value: 2.0 }
+                tTiles: { value: null },
+                tSky: { value: null },
+                poolSize: { value: this.size },
+                poolDepth: { value: 4.0 },
+                waterAttenuation: { value: new THREE.Vector3(0.8, 0.2, 0.1) },
+                reflectivity: { value: 0.1 },
+                ior: { value: 1.333 }
             },
-            // Enable derivatives if needed later for caustics projection
+            side: THREE.DoubleSide,
             extensions: {
                 derivatives: true
-            },
-            transparent: true
+            }
         });
     }
 

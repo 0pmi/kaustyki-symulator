@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { Timer } from 'three/src/core/Timer.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 /**
  * Core rendering engine responsible for the WebGL pipeline, scene management,
@@ -12,7 +14,7 @@ export default class Engine {
     constructor(canvas) {
         this.canvas = canvas;
         this.scene = new THREE.Scene();
-        this.clock = new THREE.Clock();
+        this.timer = new Timer();
 
         // Arrays to hold objects that require per-frame updates
         // (e.g., GPGPU managers, dynamic meshes)
@@ -20,6 +22,7 @@ export default class Engine {
 
         this._setupCamera();
         this._setupRenderer();
+        this._setupControls();
         this._setupEvents();
     }
 
@@ -47,6 +50,13 @@ export default class Engine {
 
         // Crucial for photorealistic physical rendering
         this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    }
+
+    _setupControls() {
+        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.enableDamping = true;
+        this.controls.dampingFactor = 0.05;
+        this.controls.maxDistance = 30;
     }
 
     _setupEvents() {
@@ -81,7 +91,10 @@ export default class Engine {
      */
     start() {
         this.renderer.setAnimationLoop(() => {
-            const deltaTime = this.clock.getDelta();
+            this.timer.update();
+            const deltaTime = this.timer.getDelta();
+
+            this.controls.update();
 
             // Update all registered components (e.g., fluid physics, controls)
             for (const updatable of this.updatables) {
