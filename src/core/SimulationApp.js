@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import Engine from './Engine.js';
 import GPGPUManager from '../physics/GPGPUManager.js';
 import WaterMesh from '../graphics/WaterMesh.js';
+import Environment from '../graphics/Environment.js';
 
 /**
  * High-level orchestrator that connects the WebGL engine, the GPGPU physics pipeline,
@@ -28,6 +29,8 @@ export default class SimulationApp {
         const gpgpuResolution = 512;
         this.gpgpu = new GPGPUManager(this.engine.renderer, gpgpuResolution);
         this.water = new WaterMesh(10, gpgpuResolution);
+
+        this.environment = new Environment(this.engine.scene, 10);
 
         this.engine.scene.add(this.water.getMesh());
 
