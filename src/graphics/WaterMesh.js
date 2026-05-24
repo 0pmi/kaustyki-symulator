@@ -37,17 +37,24 @@ export default class WaterMesh {
         this.material = new THREE.ShaderMaterial({
             vertexShader: waterVert,
             fragmentShader: waterFrag,
-            uniforms: {
-                tHeightMap: { value: null },
-                tNormalMap: { value: null },
-                tTiles: { value: null },
-                tSky: { value: null },
-                poolSize: { value: this.size },
-                poolDepth: { value: 4.0 },
-                waterAttenuation: { value: new THREE.Vector3(0.8, 0.2, 0.1) },
-                reflectivity: { value: 0.1 },
-                ior: { value: 1.333 }
-            },
+            // Inject standard Three.js lighting uniforms alongside custom simulation data
+            uniforms: THREE.UniformsUtils.merge([
+                THREE.UniformsLib['lights'],
+                {
+                    tHeightMap: { value: null },
+                    tNormalMap: { value: null },
+                    tTiles: { value: null },
+                    tSky: { value: null },
+                    poolSize: { value: this.size },
+                    poolDepth: { value: 4.0 },
+                    waterAttenuation: { value: new THREE.Vector3(0.8, 0.2, 0.1) },
+                    reflectivity: { value: 0.1 },
+                    ior: { value: 1.333 },
+                    ambientShadowBase: { value: 0.55 },
+                    shadowBlurRadius: { value: 3.5 }
+                }
+            ]),
+            lights: true,
             side: THREE.DoubleSide,
             extensions: {
                 derivatives: true
@@ -57,9 +64,12 @@ export default class WaterMesh {
 
     _setupMesh() {
         this.mesh = new THREE.Mesh(this.geometry, this.material);
-        // Frustum culling disabled because vertices are displaced in the shader;
-        // Three.js CPU bounding box won't match the GPU displaced geometry.
         this.mesh.frustumCulled = false;
+
+        // Opt-in for the custom water mesh to evaluate incoming shadow maps
+        this.mesh.receiveShadow = true;
+        this.mesh.castShadow = false;
+
     }
 
     /**

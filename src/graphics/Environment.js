@@ -22,15 +22,61 @@ export default class Environment {
     }
 
     _setupLighting() {
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.15);
         this.scene.add(ambientLight);
 
         this.sunLight = new THREE.DirectionalLight(0xffffff, 3.0);
-        this.sunLight.position.set(-5, 12, 5);
-        this.sunLight.target.position.set(0, 0, 0);
+
+        // Enable shadow casting for the primary directional light
+        this.sunLight.castShadow = true;
+
+        // Allocate a high-resolution texture to avoid shadow aliasing (staircase artifacts)
+        this.sunLight.shadow.mapSize.width = 2048;
+        this.sunLight.shadow.mapSize.height = 2048;
+
+        // Define orthographic shadow camera bounds.
+        // We multiply the pool bounds by an offset (0.75) to tightly fit the relevant area,
+        // maximizing the effective pixel density of the shadow map.
+        const bound = this.poolSize * 1.15;
+        this.sunLight.shadow.camera.left = -bound;
+        this.sunLight.shadow.camera.right = bound;
+        this.sunLight.shadow.camera.top = bound;
+        this.sunLight.shadow.camera.bottom = -bound;
+
+        // Z-bounds tailored for the scene scale
+        this.sunLight.shadow.camera.near = 0.5;
+        this.sunLight.shadow.camera.far = 50.0;
+
+        // Apply negative bias to mitigate self-shadowing artifacts (shadow acne)
+        this.sunLight.shadow.bias = -0.0005;
 
         this.scene.add(this.sunLight);
         this.scene.add(this.sunLight.target);
+    }
+
+    /**
+     * Updates the directional light position via spherical coordinates.
+     * Establishes the incident light vector (L) required for caustics projection.
+     * * @param {number} elevation - Angle above the XZ horizon plane in radians.
+     * @param {number} azimuth - Horizontal rotation angle around the Y-axis in radians.
+     */
+    updateSunPosition(elevation, azimuth) {
+        const radius = 20.0; // Orbit distance from origin
+
+        // Convert spherical coordinates to Cartesian in a Y-Up coordinate system
+        const x = radius * Math.cos(elevation) * Math.sin(azimuth);
+        const y = radius * Math.sin(elevation);
+        const z = radius * Math.cos(elevation) * Math.cos(azimuth);
+
+        this.sunLight.position.set(x, y, z);
+    }
+
+    /**
+     * Modifies the incident light scalar intensity.
+     * @param {number} intensity
+     */
+    setSunIntensity(intensity) {
+        this.sunLight.intensity = intensity;
     }
 
     _setupPool() {
@@ -44,6 +90,13 @@ export default class Environment {
             roughness: 0.5,
             side: THREE.BackSide
         });
+        this.floorMaterial.roughness = 0.85; // Diffuse-heavy material (ceramic tiles)
+        this.floorMaterial.metalness = 0.05; // Minimal metallic reflection
+
+        // Crucial: Diminish ambient HDR sky reflections to prevent shadows from washing out
+        this.floorMaterial.envMapIntensity = 0.2;
+
+        this.floorMaterial.needsUpdate = true;
 
         // Intercept standard shader compilation to inject volumetric fluid physics
         this.floorMaterial.onBeforeCompile = (shader) => {
@@ -104,8 +157,31 @@ export default class Environment {
         ];
         this.floorMesh = new THREE.Mesh(boxGeo, materials);
         this.floorMesh.position.y = (rimHeight - poolDepth) / 2.0;
+        this.floorMesh.castShadow = true;
+        this.floorMesh.receiveShadow = true;
 
         this.scene.add(this.floorMesh);
+    }
+    /**
+     * Updates the sun position based on an arbitrary world position vector (e.g., camera position).
+     * Derives corresponding spherical angles to keep the UI layer synchronized.
+     * @param {THREE.Vector3} position - The target position vector in world space.
+     * @returns {{elevation: number, azimuth: number}} Derived spherical coordinates in radians.
+     */
+    updateSunFromPosition(position) {
+        const radius = position.length();
+        if (radius === 0) return { elevation: Math.PI / 2, azimuth: 0 };
+
+        // Analytical derivation of spherical coordinates from Cartesian Y-Up system
+        const elevation = Math.asin(position.y / radius);
+        const azimuth = Math.atan2(position.x, position.z);
+
+        // Enforce boundary constraints for the physical simulation layout
+        const clampedElevation = Math.max(0.1, Math.min(Math.PI / 2, elevation));
+
+        this.updateSunPosition(clampedElevation, azimuth);
+
+        return { elevation: clampedElevation, azimuth };
     }
 
     _loadAssets() {

@@ -83,6 +83,24 @@ export default class SimulationApp {
                 }
             }
         };
+        window.addEventListener('keydown', (event) => {
+            if (event.key.toLowerCase() === 'l') {
+                const cameraPosition = this.engine.camera.position;
+
+                // Project camera vector onto the sun positioning system
+                const coords = this.environment.updateSunFromPosition(cameraPosition);
+
+                // Synchronize GUI controllers to prevent state desynchronization
+                if (this._elevationController && this._azimuthController) {
+                    this._lightParams.elevation = coords.elevation;
+                    this._lightParams.azimuth = coords.azimuth;
+
+                    // Force lil-gui to visually refresh the handle positions
+                    this._elevationController.updateDisplay();
+                    this._azimuthController.updateDisplay();
+                }
+            }
+        });
 
         // Gentle wake on hover (works concurrently with camera dragging)
         this.container.addEventListener('pointermove', (e) => {
@@ -104,6 +122,50 @@ export default class SimulationApp {
     }
     _initGUI() {
         this.gui = new GUI({ title: 'Physics Simulation Parameters' });
+        // Physical parameters for the incident light source
+        this._lightParams = {
+            elevation: Math.PI / 4,
+            azimuth: Math.PI / 4,
+            intensity: 3.0,
+            ambientShadowBase: 0.55,
+            shadowBlurRadius: 3.5
+        };
+
+        const lightFolder = this.gui.addFolder('Lighting & Shadows');
+        lightFolder.add(this._lightParams, 'ambientShadowBase', 0.0, 1.0)
+            .name('Shadow Ambient Base')
+            .onChange((val) => {
+                if (this.water && this.water.material) {
+                    this.water.material.uniforms.ambientShadowBase.value = val;
+                }
+            });
+        const updateLighting = () => {
+            this.environment.updateSunPosition(this._lightParams.elevation, this._lightParams.azimuth);
+            this.environment.setSunIntensity(this._lightParams.intensity);
+        };
+
+        // Bind controllers to instance properties for dynamic updateDisplay() access
+        this._elevationController = lightFolder.add(this._lightParams, 'elevation', 0.1, Math.PI / 2)
+            .name('Sun Elevation')
+            .onChange(updateLighting);
+
+        this._azimuthController = lightFolder.add(this._lightParams, 'azimuth', -Math.PI, Math.PI)
+            .name('Sun Azimuth')
+            .onChange(updateLighting);
+
+        lightFolder.add(this._lightParams, 'intensity', 0.0, 10.0)
+            .name('Sun Intensity')
+            .onChange(updateLighting);
+
+        lightFolder.add(this._lightParams, 'shadowBlurRadius', 0.0, 10.0)
+            .name('Shadow Blur Radius')
+            .onChange((val) => {
+                if (this.water && this.water.material) {
+                    this.water.material.uniforms.shadowBlurRadius.value = val;
+                }
+            });
+
+        updateLighting();
 
         // Define default state
         const physicsParams = {

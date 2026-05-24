@@ -45,6 +45,12 @@ export default class Engine {
             powerPreference: "high-performance"
         });
 
+        // Enable computation of shadow maps
+        this.renderer.shadowMap.enabled = true;
+
+        // Utilize Percentage-Closer Filtering with soft edges for realistic sun shadows
+        this.renderer.shadowMap.type = THREE.PCFShadowMap;
+
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
