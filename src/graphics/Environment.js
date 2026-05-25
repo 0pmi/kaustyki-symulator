@@ -48,7 +48,8 @@ export default class Environment {
         this.sunLight.shadow.camera.far = 50.0;
 
         // Apply negative bias to mitigate self-shadowing artifacts (shadow acne)
-        this.sunLight.shadow.bias = -0.0005;
+        this.sunLight.shadow.bias = -0.001;
+        this.sunLight.shadow.normalBias = 0.05;
 
         this.scene.add(this.sunLight);
         this.scene.add(this.sunLight.target);
@@ -81,67 +82,85 @@ export default class Environment {
 
     _setupPool() {
         const poolDepth = 4.0;
-        const rimHeight = 0.5; // Extension above the water surface
+        const rimHeight = 0.5;
         const totalHeight = poolDepth + rimHeight;
         const boxGeo = new THREE.BoxGeometry(this.poolSize, totalHeight, this.poolSize);
 
         this.floorMaterial = new THREE.MeshStandardMaterial({
             color: 0xaaaaaa,
-            roughness: 0.5,
+            roughness: 0.2,
+            metalness: 0.1,
             side: THREE.BackSide
         });
-        this.floorMaterial.roughness = 0.85; // Diffuse-heavy material (ceramic tiles)
-        this.floorMaterial.metalness = 0.05; // Minimal metallic reflection
 
-        // Crucial: Diminish ambient HDR sky reflections to prevent shadows from washing out
         this.floorMaterial.envMapIntensity = 0.2;
 
-        this.floorMaterial.needsUpdate = true;
+        this.floorMaterial.userData.causticsUniforms = {
+            tCaustics: { value: null },
+            poolSize: { value: this.poolSize },
+            lightDir: { value: new THREE.Vector3(0, 1, 0) }
+        };
 
-        // Intercept standard shader compilation to inject volumetric fluid physics
         this.floorMaterial.onBeforeCompile = (shader) => {
-            shader.uniforms.waterAttenuation = { value: new THREE.Vector3(0.8, 0.2, 0.1) };
+            shader.uniforms.tCaustics = this.floorMaterial.userData.causticsUniforms.tCaustics;
+            shader.uniforms.poolSize = this.floorMaterial.userData.causticsUniforms.poolSize;
+            shader.uniforms.lightDir = this.floorMaterial.userData.causticsUniforms.lightDir;
 
-            // 1. Extract world position in the vertex shader
-            shader.vertexShader = `
-                varying vec3 vWorldPos;
-                ${shader.vertexShader}
-            `.replace(
-                `#include <worldpos_vertex>`,
+            shader.vertexShader = shader.vertexShader.replace(
+                '#include <common>',
+                `#include <common>
+                varying vec3 vWorldPos;`
+            );
+            shader.vertexShader = shader.vertexShader.replace(
+                '#include <worldpos_vertex>',
                 `#include <worldpos_vertex>
-                 vWorldPos = (modelMatrix * vec4(transformed, 1.0)).xyz;`
+                vWorldPos = (modelMatrix * vec4(transformed, 1.0)).xyz;`
             );
 
-            // 2. Compute Beer-Lambert absorption in the fragment shader
-            shader.fragmentShader = `
-                uniform vec3 waterAttenuation;
-                varying vec3 vWorldPos;
-                ${shader.fragmentShader}
-            `.replace(
-                `#include <colorspace_fragment>`,
-                `
-                // Evaluate physical bounds of the fluid volume
-                if (vWorldPos.y < 0.0) {
-                    vec3 camPos = cameraPosition;
-                    float pathLength = 0.0;
-                    
-                    if (camPos.y > 0.0) {
-                        // Camera is in the air. Calculate distance from water surface intersection to the wall.
-                        vec3 dir = vWorldPos - camPos;
-                        float t = (0.0 - camPos.y) / dir.y; 
-                        vec3 surfaceHit = camPos + dir * t;
-                        pathLength = distance(surfaceHit, vWorldPos);
-                    } else {
-                        // Camera is submerged. Calculate distance from camera directly to the wall.
-                        pathLength = distance(camPos, vWorldPos);
-                    }
+            shader.fragmentShader = shader.fragmentShader.replace(
+                '#include <common>',
+                `#include <common>
+                uniform sampler2D tCaustics;
+                uniform float poolSize;
+                uniform vec3 lightDir;
+                varying vec3 vWorldPos;`
+            );
 
-                    // Apply exponential decay based on traversal distance through the medium
-                    vec3 transmission = exp(-waterAttenuation * pathLength * 0.25);
+            shader.fragmentShader = shader.fragmentShader.replace(
+                '#include <dithering_fragment>',
+                `#include <dithering_fragment>
+                
+                vec3 refractedDir = refract(normalize(lightDir), vec3(0.0, 1.0, 0.0), 1.0 / 1.333);
+                
+                float tProj = 0.0;
+                if (refractedDir.y < -0.001) {
+                    tProj = (-4.0 - vWorldPos.y) / refractedDir.y; 
+                }
+                vec3 projectedPos = vWorldPos + refractedDir * tProj;
+                
+                vec2 causticUv = vec2(projectedPos.x, -projectedPos.z) / (poolSize * 1.5) + 0.5;
+                
+                float fadeU = smoothstep(0.0, 0.02, causticUv.x) * (1.0 - smoothstep(0.98, 1.0, causticUv.x));
+                float fadeV = smoothstep(0.0, 0.02, causticUv.y) * (1.0 - smoothstep(0.98, 1.0, causticUv.y));
+                float edgeFade = fadeU * fadeV;
+                
+                float tShadow = (0.5 - vWorldPos.y) / max(-lightDir.y, 0.0001);
+                vec2 pXZ = vWorldPos.xz - lightDir.xz * tShadow;
+                float shadowX = 1.0 - smoothstep(poolSize * 0.5 - 0.05, poolSize * 0.5 + 0.05, abs(pXZ.x));
+                float shadowZ = 1.0 - smoothstep(poolSize * 0.5 - 0.05, poolSize * 0.5 + 0.05, abs(pXZ.y));
+                float rimShadow = shadowX * shadowZ;
+                
+                if(causticUv.x >= 0.0 && causticUv.x <= 1.0 && causticUv.y >= 0.0 && causticUv.y <= 1.0 && vWorldPos.y <= 0.1) {
+                    float causticLight = texture2D(tCaustics, causticUv).r * edgeFade * rimShadow; 
+                    gl_FragColor.rgb += causticLight * gl_FragColor.rgb * 1.5;
+                }
+
+                if (vWorldPos.y < 0.0) {
+                    float depth = abs(vWorldPos.y); 
+                    vec3 waterAttenuation = vec3(0.8, 0.2, 0.1);
+                    vec3 transmission = exp(-waterAttenuation * depth * 0.5); 
                     gl_FragColor.rgb *= transmission;
                 }
-                
-                #include <colorspace_fragment>
                 `
             );
         };
@@ -152,9 +171,10 @@ export default class Environment {
             this.floorMaterial, // 1: Left
             invisibleMaterial,  // 2: Up
             this.floorMaterial, // 3: Down
-            this.floorMaterial, // 4: Forward
+            this.floorMaterial, // 4: Front
             this.floorMaterial  // 5: Back
         ];
+
         this.floorMesh = new THREE.Mesh(boxGeo, materials);
         this.floorMesh.position.y = (rimHeight - poolDepth) / 2.0;
         this.floorMesh.castShadow = true;
@@ -192,9 +212,8 @@ export default class Environment {
         const normalMap = textureLoader.load(`${textureBaseUrl}tiles_01_nor_gl_1k.jpg`);
         const roughnessMap = textureLoader.load(`${textureBaseUrl}tiles_01_rough_1k.jpg`);
 
+        const tileRepeat = 4;
         const textures = [diffuseMap, normalMap, roughnessMap];
-        const tileRepeat = 4.0;
-
         for (const tex of textures) {
             tex.wrapS = THREE.RepeatWrapping;
             tex.wrapT = THREE.RepeatWrapping;
@@ -208,7 +227,6 @@ export default class Environment {
         this.floorMaterial.roughnessMap = roughnessMap;
         this.floorMaterial.needsUpdate = true;
 
-        // Expose the diffuse map for the water shader raytracing
         this.diffuseMap = diffuseMap;
 
         const hdrLoader = new HDRLoader();
@@ -217,11 +235,7 @@ export default class Environment {
             this.scene.background = texture;
             this.scene.environment = texture;
             this.scene.backgroundIntensity = 0.5;
-
-            // Expose the HDR sky map for the water shader reflections
             this.hdrTexture = texture;
-        }, undefined, (error) => {
-            console.error("Environment: Failed to load HDR map.", error);
         });
     }
 

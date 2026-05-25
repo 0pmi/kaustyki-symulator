@@ -4,6 +4,7 @@ import GPGPUManager from '../physics/GPGPUManager.js';
 import WaterMesh from '../graphics/WaterMesh.js';
 import Environment from '../graphics/Environment.js';
 import GUI from 'lil-gui';
+import CausticsGenerator from "../graphics/CausticsGenerator.js";
 
 /**
  * High-level orchestrator connecting the physical pipelines with graphic asset pipelines.
@@ -28,23 +29,45 @@ export default class SimulationApp {
 
     _initPipeline() {
         const gpgpuResolution = 512;
+
         this.gpgpu = new GPGPUManager(this.engine.renderer, gpgpuResolution);
         this.water = new WaterMesh(10, gpgpuResolution);
 
-        // Instantiate environment passing both scene and core renderer context
         this.environment = new Environment(this.engine.scene, this.engine.renderer, 10);
+
+        this.caustics = new CausticsGenerator(this.engine.renderer, 10, 1024);
 
         this.engine.scene.add(this.water.getMesh());
 
         this.engine.addUpdatable({
-            update: () => {
+            update: (deltaTime) => {
                 this.gpgpu.update();
-                this.water.updateTextures(this.gpgpu.getHeightTexture(), this.gpgpu.getNormalTexture());
 
-                // Inject environmental textures to the shader once loaded asynchronously
-                if (this.environment.diffuseMap && this.environment.hdrTexture) {
+                const heightMap = this.gpgpu.getHeightTexture ? this.gpgpu.getHeightTexture() : this.gpgpu.readBuffer.texture;
+                const normalMap = this.gpgpu.getNormalTexture ? this.gpgpu.getNormalTexture() : this.gpgpu.normalTarget.texture;
+
+                this.water.updateTextures(heightMap, normalMap);
+
+                if (this.environment.diffuseMap) {
                     this.water.material.uniforms.tTiles.value = this.environment.diffuseMap;
+                }
+                if (this.environment.hdrTexture) {
                     this.water.material.uniforms.tSky.value = this.environment.hdrTexture;
+                }
+
+                const lightDir = this.environment.getLightDirection();
+                this.caustics.update(heightMap, normalMap, lightDir);
+
+                const causticsTex = this.caustics.getTexture();
+
+                if (this.water.material.uniforms.tCaustics) {
+                    this.water.material.uniforms.tCaustics.value = causticsTex;
+                    this.water.material.uniforms.lightDir.value.copy(lightDir);
+                }
+
+                if (this.environment.floorMaterial.userData.causticsUniforms) {
+                    this.environment.floorMaterial.userData.causticsUniforms.tCaustics.value = causticsTex;
+                    this.environment.floorMaterial.userData.causticsUniforms.lightDir.value.copy(lightDir);
                 }
             }
         });
@@ -128,9 +151,9 @@ export default class SimulationApp {
             azimuth: Math.PI / 4,
             intensity: 3.0,
             ambientShadowBase: 0.55,
-            shadowBlurRadius: 3.5
+            shadowBlurRadius: 3.5,
+            causticsIntensity: 0.15
         };
-
         const lightFolder = this.gui.addFolder('Lighting & Shadows');
         lightFolder.add(this._lightParams, 'ambientShadowBase', 0.0, 1.0)
             .name('Shadow Ambient Base')
@@ -165,6 +188,14 @@ export default class SimulationApp {
                 }
             });
 
+        lightFolder.add(this._lightParams, 'causticsIntensity', 0.0, 1.0)
+            .name('Caustics Power')
+            .onChange((val) => {
+                if (this.caustics) {
+                    this.caustics.material.uniforms.causticsIntensity.value = val;
+                }
+            });
+
         updateLighting();
 
         // Define default state
@@ -178,7 +209,6 @@ export default class SimulationApp {
 
         const opticsFolder = this.gui.addFolder('Optical Properties');
 
-        // When sliding IOR, observe how the "weird angle" Snell's window changes
         opticsFolder.add(physicsParams, 'ior', 1.0, 1.6).name('Index of Refraction').onChange((val) => {
             if (this.water && this.water.material) {
                 this.water.material.uniforms.ior.value = val;
@@ -191,7 +221,6 @@ export default class SimulationApp {
             }
         });
 
-        // Add volumetric fluid absorption controllers
         const updateAttenuation = () => {
             if (this.water && this.water.material) {
                 this.water.material.uniforms.waterAttenuation.value.set(

@@ -45,6 +45,8 @@ export default class WaterMesh {
                     tNormalMap: { value: null },
                     tTiles: { value: null },
                     tSky: { value: null },
+                    tCaustics: { value: null },
+                    lightDir: { value: new THREE.Vector3(0, 1, 0) },
                     poolSize: { value: this.size },
                     poolDepth: { value: 4.0 },
                     waterAttenuation: { value: new THREE.Vector3(0.8, 0.2, 0.1) },
@@ -60,13 +62,13 @@ export default class WaterMesh {
                 derivatives: true
             }
         });
+
     }
 
     _setupMesh() {
         this.mesh = new THREE.Mesh(this.geometry, this.material);
         this.mesh.frustumCulled = false;
 
-        // Opt-in for the custom water mesh to evaluate incoming shadow maps
         this.mesh.receiveShadow = true;
         this.mesh.castShadow = false;
 

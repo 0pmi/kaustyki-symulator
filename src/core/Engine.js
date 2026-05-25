@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { Timer } from 'three/src/core/Timer.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import {Timer} from "three";
 
 /**
  * Core rendering engine responsible for the WebGL pipeline, scene management,
@@ -16,8 +16,6 @@ export default class Engine {
         this.scene = new THREE.Scene();
         this.timer = new Timer();
 
-        // Arrays to hold objects that require per-frame updates
-        // (e.g., GPGPU managers, dynamic meshes)
         this.updatables = [];
 
         this._setupCamera();
