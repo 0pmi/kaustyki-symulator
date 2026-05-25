@@ -4,6 +4,7 @@ uniform vec3 lightDir;
 uniform float poolSize;
 uniform float poolDepth;
 uniform float ior;
+uniform float iorOffset;
 
 varying vec3 vOldPos;
 varying vec3 vNewPos;
@@ -21,7 +22,7 @@ void main() {
     normal = mix(vec3(0.0, 1.0, 0.0), normal, isInside);
 
     vec3 surfacePos = vec3(position.x, height, position.y);
-    vec3 refractedDir = refract(lightDir, normal, 1.0 / ior);
+    vec3 refractedDir = refract(lightDir, normal, 1.0 / (ior + iorOffset));
 
     float t = (-poolDepth - surfacePos.y) / refractedDir.y;
     vec3 hitPos = surfacePos + refractedDir * t;

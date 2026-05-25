@@ -48,6 +48,8 @@ export default class CausticsGenerator {
                 poolSize: { value: this.poolSize },
                 poolDepth: { value: 4.0 },
                 ior: { value: 1.333 },
+                iorOffset: { value: 0.0 },
+                channelMask: { value: new THREE.Vector3(1, 1, 1) },
                 causticsIntensity: { value: 0.15 }
             },
 
@@ -82,13 +84,28 @@ export default class CausticsGenerator {
         this.material.uniforms.lightDir.value.copy(lightDirection).normalize();
 
         const currentRenderTarget = this.renderer.getRenderTarget();
+        const currentAutoClear = this.renderer.autoClear;
 
         // Render to the internal FBO with a black clear color (additive base)
         this.renderer.setRenderTarget(this.renderTarget);
         this.renderer.setClearColor(0x000000, 1);
         this.renderer.clear();
+
+        this.renderer.autoClear = false;
+
+        this.material.uniforms.iorOffset.value = -0.015;
+        this.material.uniforms.channelMask.value.set(1.0, 0.0, 0.0);
         this.renderer.render(this.scene, this.camera);
 
+        this.material.uniforms.iorOffset.value = 0.0;
+        this.material.uniforms.channelMask.value.set(0.0, 1.0, 0.0);
+        this.renderer.render(this.scene, this.camera);
+
+        this.material.uniforms.iorOffset.value = 0.015;
+        this.material.uniforms.channelMask.value.set(0.0, 0.0, 1.0);
+        this.renderer.render(this.scene, this.camera);
+
+        this.renderer.autoClear = currentAutoClear;
         this.renderer.setRenderTarget(currentRenderTarget);
     }
 

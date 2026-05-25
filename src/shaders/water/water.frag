@@ -92,8 +92,9 @@ vec3 getPoolColor(vec3 origin, vec3 dir) {
     vec2 causticsUv = vec2(projectedPos.x, -projectedPos.z) / (poolSize * 1.5) + 0.5;
 
     float causticIntensity = 0.0;
+    vec3 causticLight = vec3(0.0);
     if (causticsUv.x >= 0.0 && causticsUv.x <= 1.0 && causticsUv.y >= 0.0 && causticsUv.y <= 1.0) {
-        causticIntensity = texture2D(tCaustics, causticsUv).r;
+        causticLight = texture2D(tCaustics, causticsUv).rgb; // <--- CZYTAMY .rgb!
     }
 
     float fadeU = smoothstep(0.0, 0.02, causticsUv.x) * (1.0 - smoothstep(0.98, 1.0, causticsUv.x));
@@ -101,9 +102,9 @@ vec3 getPoolColor(vec3 origin, vec3 dir) {
     float edgeFade = fadeU * fadeV;
 
     float directLight = clamp((shadowMask - ambientShadowBase) / max(1.0 - ambientShadowBase, 0.001), 0.0, 1.0);
-    causticIntensity *= directLight * edgeFade;
+    causticLight *= directLight * edgeFade;
 
-    vec3 illuminatedTile = tileColor + vec3(causticIntensity * 1.5);
+    vec3 illuminatedTile = tileColor + causticLight * 1.5;
 
     float darken = mix(1.0, 0.95, blendFloor);
     return illuminatedTile * transmission * shadowMask * darken;

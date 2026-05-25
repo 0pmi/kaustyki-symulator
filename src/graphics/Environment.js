@@ -151,7 +151,7 @@ export default class Environment {
                 float rimShadow = shadowX * shadowZ;
                 
                 if(causticUv.x >= 0.0 && causticUv.x <= 1.0 && causticUv.y >= 0.0 && causticUv.y <= 1.0 && vWorldPos.y <= 0.1) {
-                    float causticLight = texture2D(tCaustics, causticUv).r * edgeFade * rimShadow; 
+                    vec3 causticLight = texture2D(tCaustics, causticUv).rgb * edgeFade * rimShadow; 
                     gl_FragColor.rgb += causticLight * gl_FragColor.rgb * 1.5;
                 }
 

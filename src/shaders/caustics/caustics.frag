@@ -1,5 +1,5 @@
 uniform float causticsIntensity;
-
+uniform vec3 channelMask;
 varying vec3 vOldPos;
 varying vec3 vNewPos;
 
@@ -11,5 +11,5 @@ void main() {
     intensity *= causticsIntensity * 2.5;
     intensity = clamp(intensity, 0.0, 5.0);
 
-    gl_FragColor = vec4(vec3(intensity), 0.0);
+    gl_FragColor = vec4(channelMask * intensity, 0.0);
 }
