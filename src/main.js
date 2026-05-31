@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 3. Initialize Advanced 3D Caustics and Fluid Simulation Environment
     const container = document.getElementById('three-container');
     if (container) {
-        const app = new SimulationApp(container);
+        const app = new SimulationApp(container, i18n);
         app.start();
     }
 });

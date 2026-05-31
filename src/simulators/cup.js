@@ -37,15 +37,6 @@ export function initCupSimulation() {
         const sunDir = { x: Math.cos(sunAngle), y: Math.sin(sunAngle) };
         const sunNormal = { x: -sunDir.y, y: sunDir.x };
 
-        // 1. Render the cylindrical boundary
-        ctxCup.beginPath();
-        ctxCup.arc(cupCenter.x, cupCenter.y, cupRadius, 0, 2 * Math.PI);
-        ctxCup.strokeStyle = 'rgba(231, 76, 60, 0.5)';
-        ctxCup.fillStyle = 'rgba(231, 76, 60, 0.02)';
-        ctxCup.lineWidth = 3;
-        ctxCup.fill();
-        ctxCup.stroke();
-
         ctxCup.globalCompositeOperation = 'lighter';
         ctxCup.lineWidth = 1;
 
@@ -92,11 +83,11 @@ export function initCupSimulation() {
                     ctxCup.strokeStyle = `rgba(255, 255, 255, ${alphaBase})`;
                     ctxCup.stroke();
 
-                    // 2. Internal reflection calculation
+                    // Internal reflection calculation
                     const normal = vec.normalize(vec.sub(cupCenter, hitBack));
                     const dotDN = vec.dot(sunDir, normal);
 
-                    // Vector reflection: R = I - 2(I \cdot N)N
+                    // Vector reflection: R = I - 2(I * N)N
                     const reflectDir = vec.sub(sunDir, vec.mul(normal, 2 * dotDN));
 
                     // Offset origin slightly to prevent floating-point self-intersection
@@ -118,6 +109,13 @@ export function initCupSimulation() {
             }
         }
         ctxCup.globalCompositeOperation = 'source-over';
+
+        // Render the cylindrical boundary
+        ctxCup.beginPath();
+        ctxCup.arc(cupCenter.x, cupCenter.y, cupRadius, 0, 2 * Math.PI);
+        ctxCup.strokeStyle = 'rgba(231, 76, 60, 0.8)';
+        ctxCup.lineWidth = 4;
+        ctxCup.stroke();
     }
 
     function updateCupUI() {

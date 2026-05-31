@@ -4,12 +4,13 @@ import waterFrag from '../shaders/water/water.frag';
 
 /**
  * Represents the physical water surface.
- * Handles the high-resolution grid geometry and custom shader material.
+ * Manages the high-density geometric grid required for vertex displacement
+ * and integrates custom optical shaders with Three.js lighting.
  */
 export default class WaterMesh {
     /**
      * @param {number} size - Spatial dimensions of the water plane.
-     * @param {number} resolution - Vertex count along one edge (matches GPGPU resolution ideally).
+     * @param {number} resolution - Vertex count along one edge. Should ideally match the GPGPU texture resolution for 1:1 displacement mapping.
      */
     constructor(size = 10, resolution = 512) {
         this.size = size;
@@ -20,8 +21,12 @@ export default class WaterMesh {
         this._setupMesh();
     }
 
+    /**
+     * @private
+     */
     _setupGeometry() {
-        // High density plane for vertex displacement mapping
+        // Generates a high-density grid. The sheer number of vertices is necessary
+        // because GPGPU height data displaces individual vertices directly in the vertex shader.
         this.geometry = new THREE.PlaneGeometry(
             this.size,
             this.size,
@@ -29,15 +34,19 @@ export default class WaterMesh {
             this.resolution - 1
         );
 
-        // Rotate to lie perfectly flat on the XZ plane
+        // Reorient the plane from the default XY coordinate system to the XZ (ground) plane
         this.geometry.rotateX(-Math.PI / 2);
     }
 
+    /**
+     * @private
+     */
     _setupMaterial() {
         this.material = new THREE.ShaderMaterial({
             vertexShader: waterVert,
             fragmentShader: waterFrag,
-            // Inject standard Three.js lighting uniforms alongside custom simulation data
+            // Merging standard Three.js lighting uniforms allows the custom shader
+            // to react natively to Scene lights while processing optical variables.
             uniforms: THREE.UniformsUtils.merge([
                 THREE.UniformsLib['lights'],
                 {
@@ -59,25 +68,30 @@ export default class WaterMesh {
             lights: true,
             side: THREE.DoubleSide,
             extensions: {
+                // Required for dFdx/dFdy functions in the fragment shader
                 derivatives: true
             }
         });
-
     }
 
+    /**
+     * @private
+     */
     _setupMesh() {
         this.mesh = new THREE.Mesh(this.geometry, this.material);
+
+        // Disabling frustum culling prevents the mesh from arbitrarily disappearing
+        // when the camera looks closely at a displaced wave while the original flat bounding box is off-screen.
         this.mesh.frustumCulled = false;
 
         this.mesh.receiveShadow = true;
         this.mesh.castShadow = false;
-
     }
 
     /**
-     * Synchronizes simulation textures with the rendering pipeline.
-     * @param {THREE.Texture} heightTexture
-     * @param {THREE.Texture} normalTexture
+     * Synchronizes the latest fluid simulation state with the rendering pipeline.
+     * @param {THREE.Texture} heightTexture - Float texture dictating vertical vertex displacement.
+     * @param {THREE.Texture} normalTexture - RGB texture dictating surface normals for light refraction.
      */
     updateTextures(heightTexture, normalTexture) {
         this.material.uniforms.tHeightMap.value = heightTexture;
@@ -85,8 +99,7 @@ export default class WaterMesh {
     }
 
     /**
-     * Returns the finalized THREE.Mesh to be added to the scene.
-     * @returns {THREE.Mesh}
+     * @returns {THREE.Mesh} The finalized water surface entity.
      */
     getMesh() {
         return this.mesh;

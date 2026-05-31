@@ -1,9 +1,48 @@
 /**
  * @fileoverview Simulates light dispersion and rainbow formation
- * within a circular raindrop via internal reflection and refraction.
+ * within a circular raindrop via sequential internal reflection and refraction.
  */
 
-import { vec, intersectCircle, refract } from '../utils/math.js';
+const MathUtils = {
+    add: (a, b) => ({ x: a.x + b.x, y: a.y + b.y }),
+    sub: (a, b) => ({ x: a.x - b.x, y: a.y - b.y }),
+    mul: (v, s) => ({ x: v.x * s, y: v.y * s }),
+    mag: (v) => Math.sqrt(v.x * v.x + v.y * v.y),
+    normalize: (v) => {
+        const m = MathUtils.mag(v);
+        return m === 0 ? { x: 0, y: 0 } : { x: v.x / m, y: v.y / m };
+    },
+    dot: (a, b) => a.x * b.x + a.y * b.y,
+    reflect: (incident, normal) => {
+        const dot = MathUtils.dot(incident, normal);
+        return MathUtils.sub(incident, MathUtils.mul(normal, 2.0 * dot));
+    },
+    intersectCircle: (ro, rd, center, radius) => {
+        const oc = MathUtils.sub(ro, center);
+        const b = MathUtils.dot(oc, rd);
+        const c = MathUtils.dot(oc, oc) - radius * radius;
+        const delta = b * b - c;
+        if (delta > 0) {
+            const sqrtDelta = Math.sqrt(delta);
+            const t1 = -b - sqrtDelta;
+            const t2 = -b + sqrtDelta;
+            // Return the first forward-facing intersection
+            if (t1 > 1e-4) return t1;
+            if (t2 > 1e-4) return t2;
+        }
+        return null;
+    },
+    refract: (incident, normal, eta) => {
+        const cosi = -MathUtils.dot(incident, normal);
+        const sin2t = eta * eta * (1.0 - cosi * cosi);
+        if (sin2t > 1.0) return null; // Total Internal Reflection
+        const cost = Math.sqrt(1.0 - sin2t);
+        return MathUtils.add(
+            MathUtils.mul(incident, eta),
+            MathUtils.mul(normal, eta * cosi - cost)
+        );
+    }
+};
 
 export function initPrismSimulation() {
     const canvasPrism = document.getElementById('canvas-prism');
@@ -18,21 +57,25 @@ export function initPrismSimulation() {
     };
 
     /**
-     * Renders chromatic dispersion by processing distinct wavelengths independently.
+     * Renders chromatic dispersion by tracking physical hits step-by-step.
+     * Prevents overdraw by splitting wavelengths only after droplet entry.
      */
     function drawPrismSimulation() {
         ctxPrism.globalCompositeOperation = 'source-over';
         ctxPrism.clearRect(0, 0, canvasPrism.width, canvasPrism.height);
 
+        // Normalize slider input [-20, 20] to [-1.0, 1.0] for geometric targeting
+        const sliderVal = parseFloat(prismSliders.angle?.value || -5);
+        const normalizedOffset = sliderVal / 20.0;
+
         const config = {
-            angle: parseInt(prismSliders.angle?.value || 0, 10) * (Math.PI / 180),
-            rayCount: parseInt(prismSliders.ray?.value || 50, 10)
+            rayCount: parseInt(prismSliders.ray?.value || 1, 10)
         };
 
-        const dropCenter = { x: canvasPrism.width * 0.65, y: canvasPrism.height * 0.35 };
-        const dropRadius = 160;
+        const dropCenter = { x: canvasPrism.width * 0.65, y: canvasPrism.height * 0.45 };
+        const dropRadius = 180;
 
-        // 1. Render the physical water droplet
+        // Base droplet rendering
         ctxPrism.beginPath();
         ctxPrism.arc(dropCenter.x, dropCenter.y, dropRadius, 0, Math.PI * 2);
         ctxPrism.strokeStyle = 'rgba(255, 255, 255, 0.2)';
@@ -40,97 +83,137 @@ export function initPrismSimulation() {
         ctxPrism.fill();
         ctxPrism.stroke();
 
-        ctxPrism.globalCompositeOperation = 'screen';
+        const lightDir = { x: 1, y: 0 };
 
-        const alpha = Math.min(1.0, 12.0 / config.rayCount).toFixed(3);
+        // Map offset to physical drop radius. Invert Y so positive slider values move up.
+        const targetOffset = -normalizedOffset * dropRadius * 0.95;
 
-        // Exaggerated Indices of Refraction (IOR) per wavelength
-        // to clearly visualize color separation.
-        const colors = [
-            { hex: `rgba(255, 30, 30, ${alpha})`,   ior: 1.315 }, // Red
-            { hex: `rgba(255, 150, 0, ${alpha})`,   ior: 1.322 }, // Orange
-            { hex: `rgba(255, 255, 0, ${alpha})`,   ior: 1.328 }, // Yellow
-            { hex: `rgba(0, 255, 0, ${alpha})`,     ior: 1.335 }, // Green
-            { hex: `rgba(0, 150, 255, ${alpha})`,   ior: 1.342 }, // Blue
-            { hex: `rgba(150, 0, 255, ${alpha})`,   ior: 1.350 }  // Violet
+        // Limit maximum beam spread to 40% of the radius to maintain visual clarity
+        const beamWidth = (config.rayCount === 1) ? 0 : (config.rayCount / 300) * dropRadius * 0.4;
+
+        // Independent alpha scaling based on ray density to prevent white blowout
+        const incidentAlpha = Math.max(0.02, 1.0 / config.rayCount).toFixed(3);
+        const colorAlpha = Math.max(0.08, 4.0 / config.rayCount).toFixed(3);
+        const secondaryAlpha = Math.max(0.02, 1.5 / config.rayCount).toFixed(3);
+
+        const wavelengths = [
+            { r: 255, g: 30,  b: 30,  ior: 1.320 },
+            { r: 255, g: 150, b: 0,   ior: 1.325 },
+            { r: 255, g: 255, b: 0,   ior: 1.330 },
+            { r: 0,   g: 255, b: 0,   ior: 1.335 },
+            { r: 0,   g: 150, b: 255, ior: 1.340 },
+            { r: 150, g: 0,   b: 255, ior: 1.345 }
         ];
 
-        // Incident white light directional vectors
-        const lightDir = { x: Math.cos(config.angle), y: Math.sin(config.angle) };
-        const lightNormal = { x: lightDir.y, y: -lightDir.x };
+        // Outer loop iterates through spatial rays to draw incident light once per coordinate
+        for (let i = 0; i < config.rayCount; i++) {
+            const t = config.rayCount > 1 ? (i / (config.rayCount - 1)) - 0.5 : 0;
+            const currentOffset = targetOffset + t * beamWidth;
 
-        // Process ray tracing independently for each wavelength channel
-        for (let c = 0; c < colors.length; c++) {
-            const channel = colors[c];
-            ctxPrism.strokeStyle = channel.hex;
-            ctxPrism.lineWidth = 1;
+            // Discard rays outside the droplet boundaries
+            if (Math.abs(currentOffset) >= dropRadius * 0.99) continue;
+
+            let rayPos = { x: dropCenter.x - 500, y: dropCenter.y + currentOffset };
+
+            const t1 = MathUtils.intersectCircle(rayPos, lightDir, dropCenter, dropRadius);
+            if (!t1) continue;
+
+            const hit1 = MathUtils.add(rayPos, MathUtils.mul(lightDir, t1));
+
+            // Render pure white incident ray (No additive blending to prevent glare)
+            ctxPrism.globalCompositeOperation = 'source-over';
             ctxPrism.beginPath();
+            ctxPrism.moveTo(rayPos.x, rayPos.y);
+            ctxPrism.lineTo(hit1.x, hit1.y);
+            ctxPrism.strokeStyle = `rgba(255, 255, 255, ${incidentAlpha})`;
+            ctxPrism.lineWidth = 1;
+            ctxPrism.stroke();
 
-            for (let i = 0; i < config.rayCount; i++) {
-                const t = i / (config.rayCount - 1 || 1);
+            const normal1 = MathUtils.normalize(MathUtils.sub(hit1, dropCenter));
 
-                // Concentrate rays in the Descartes zone (70-95% of radius)
-                // for optimal rainbow intensity visibility.
-                const offset = dropRadius * 0.8 + t * dropRadius * 0.35;
+            // Switch to additive blending for internal spectrum separation
+            ctxPrism.globalCompositeOperation = 'lighter';
 
-                let rayPos = {
-                    x: dropCenter.x - lightDir.x * 500 + lightNormal.x * offset,
-                    y: dropCenter.y - lightDir.y * 500 + lightNormal.y * offset
-                };
-                let rayDir = { x: lightDir.x, y: lightDir.y };
+            // Inner loop computes dispersion specific to each wavelength
+            for (let c = 0; c < wavelengths.length; c++) {
+                const channel = wavelengths[c];
+                ctxPrism.strokeStyle = `rgba(${channel.r}, ${channel.g}, ${channel.b}, ${colorAlpha})`;
 
-                // Phase 1: Droplet entry
-                const t1 = intersectCircle(rayPos, rayDir, dropCenter, dropRadius);
-                if (t1) {
-                    const hit1 = vec.add(rayPos, vec.mul(rayDir, t1));
-                    ctxPrism.moveTo(rayPos.x, rayPos.y);
-                    ctxPrism.lineTo(hit1.x, hit1.y);
+                const dir1 = MathUtils.refract(lightDir, normal1, 1.0 / channel.ior);
+                if (!dir1) continue;
 
-                    const normal1 = vec.normalize(vec.sub(hit1, dropCenter));
+                // Phase 1: Internal propagation to back wall
+                const startInside1 = MathUtils.add(hit1, MathUtils.mul(dir1, 0.01));
+                const t2 = MathUtils.intersectCircle(startInside1, dir1, dropCenter, dropRadius);
+                if (!t2) continue;
 
-                    // Refraction (Air -> Water) based on specific IOR
-                    const rDir1 = refract(rayDir, normal1, 1.0 / channel.ior);
+                const hit2 = MathUtils.add(startInside1, MathUtils.mul(dir1, t2));
+                ctxPrism.beginPath();
+                ctxPrism.moveTo(hit1.x, hit1.y);
+                ctxPrism.lineTo(hit2.x, hit2.y);
+                ctxPrism.stroke();
 
-                    if (rDir1) {
-                        const startInside = vec.add(hit1, vec.mul(rDir1, 0.01));
+                // Phase 2: Primary internal reflection
+                const normal2_in = MathUtils.normalize(MathUtils.sub(dropCenter, hit2));
+                const dir2 = MathUtils.reflect(dir1, normal2_in);
 
-                        // Phase 2: Internal propagation to back wall
-                        const t2 = intersectCircle(startInside, rDir1, dropCenter, dropRadius);
-                        if (t2) {
-                            const hit2 = vec.add(startInside, vec.mul(rDir1, t2));
-                            ctxPrism.lineTo(hit2.x, hit2.y);
+                const startInside2 = MathUtils.add(hit2, MathUtils.mul(dir2, 0.01));
+                const t3 = MathUtils.intersectCircle(startInside2, dir2, dropCenter, dropRadius);
+                if (!t3) continue;
 
-                            const normal2 = vec.normalize(vec.sub(dropCenter, hit2));
-                            const dotDN = vec.dot(rDir1, normal2);
+                const hit3 = MathUtils.add(startInside2, MathUtils.mul(dir2, t3));
+                ctxPrism.beginPath();
+                ctxPrism.moveTo(hit2.x, hit2.y);
+                ctxPrism.lineTo(hit3.x, hit3.y);
+                ctxPrism.stroke();
 
-                            // Phase 3: Partial internal reflection
-                            const rDir2 = vec.sub(rDir1, vec.mul(normal2, 2 * dotDN));
-                            const startInside2 = vec.add(hit2, vec.mul(rDir2, 0.01));
+                // Phase 3: Primary rainbow exit
+                const normal3_in = MathUtils.normalize(MathUtils.sub(dropCenter, hit3));
+                const primaryExitDir = MathUtils.refract(dir2, normal3_in, channel.ior / 1.0);
 
-                            // Phase 4: Droplet exit
-                            const t3 = intersectCircle(startInside2, rDir2, dropCenter, dropRadius);
-                            if (t3) {
-                                const hit3 = vec.add(startInside2, vec.mul(rDir2, t3));
-                                ctxPrism.lineTo(hit3.x, hit3.y);
+                if (primaryExitDir) {
+                    const hitPrimaryEnd = MathUtils.add(hit3, MathUtils.mul(primaryExitDir, 1000));
+                    ctxPrism.beginPath();
+                    ctxPrism.moveTo(hit3.x, hit3.y);
+                    ctxPrism.lineTo(hitPrimaryEnd.x, hitPrimaryEnd.y);
+                    ctxPrism.stroke();
+                }
 
-                                const normal3 = vec.normalize(vec.sub(dropCenter, hit3));
+                // Phase 4: Secondary internal reflection and rainbow
+                const dir3 = MathUtils.reflect(dir2, normal3_in);
+                const startInside3 = MathUtils.add(hit3, MathUtils.mul(dir3, 0.01));
+                const t4 = MathUtils.intersectCircle(startInside3, dir3, dropCenter, dropRadius);
 
-                                // Refraction (Water -> Air)
-                                const rDir3 = refract(rDir2, normal3, channel.ior / 1.0);
+                if (t4) {
+                    const hit4 = MathUtils.add(startInside3, MathUtils.mul(dir3, t4));
 
-                                if (rDir3) {
-                                    // Project dispersed spectrum toward the observer
-                                    const hit4 = vec.add(hit3, vec.mul(rDir3, 2000));
-                                    ctxPrism.lineTo(hit4.x, hit4.y);
-                                }
-                            }
-                        }
+                    ctxPrism.strokeStyle = `rgba(${channel.r}, ${channel.g}, ${channel.b}, ${secondaryAlpha})`;
+                    ctxPrism.beginPath();
+                    ctxPrism.moveTo(hit3.x, hit3.y);
+                    ctxPrism.lineTo(hit4.x, hit4.y);
+                    ctxPrism.stroke();
+
+                    const normal4_in = MathUtils.normalize(MathUtils.sub(dropCenter, hit4));
+                    const secondaryExitDir = MathUtils.refract(dir3, normal4_in, channel.ior / 1.0);
+
+                    if (secondaryExitDir) {
+                        const hitSecondaryEnd = MathUtils.add(hit4, MathUtils.mul(secondaryExitDir, 1000));
+                        ctxPrism.beginPath();
+                        ctxPrism.moveTo(hit4.x, hit4.y);
+                        ctxPrism.lineTo(hitSecondaryEnd.x, hitSecondaryEnd.y);
+                        ctxPrism.stroke();
                     }
                 }
             }
-            ctxPrism.stroke();
         }
+
+        // Draw physical boundary outline over all rays to prevent edge aliasing
         ctxPrism.globalCompositeOperation = 'source-over';
+        ctxPrism.beginPath();
+        ctxPrism.arc(dropCenter.x, dropCenter.y, dropRadius, 0, Math.PI * 2);
+        ctxPrism.strokeStyle = 'rgba(74, 144, 226, 0.6)';
+        ctxPrism.lineWidth = 2;
+        ctxPrism.stroke();
     }
 
     function updatePrismUI() {

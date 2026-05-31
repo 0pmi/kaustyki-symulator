@@ -173,7 +173,7 @@
               <span data-i18n="cup.controls.rayCount"></span>
               <span id="reflect-ray-count-val">5</span>
             </label>
-            <input type="range" id="reflect-ray-count" min="5" max="1000" value="5">
+            <input type="range" id="reflect-ray-count" min="5" max="500" value="5">
           </div>
 
           <div class="theory-placeholder" style="font-size: 0.85rem; margin-top: 20px;" data-i18n="cup.tip"></div>
@@ -202,7 +202,7 @@
               <span data-i18n="prism.controls.rayCount"></span>
               <span id="prism-ray-count-val">1</span>
             </label>
-            <input type="range" id="prism-ray-count" min="1" max="300" value="1">
+            <input type="range" id="prism-ray-count" min="1" max="150" value="1">
           </div>
 
           <div class="control-group">
@@ -232,8 +232,15 @@
 
     <section id="gpu-gallery" class="content-section">
       <h2 data-i18n="gpu.title"></h2>
+
       <div class="theory-placeholder" data-i18n="gpu.theory"></div>
-      <div id="three-container" style="width: 100%; height: 500px; border-radius: 8px; overflow: hidden; background: #000;"></div>
+
+      <div id="three-container" style="width: 100%; height: 500px; border-radius: 8px; overflow: hidden; background: #000; margin-bottom: 20px;"></div>
+
+      <div class="simulation-analysis">
+        <h3 data-i18n="gpu.descTitle"></h3>
+        <div data-i18n="gpu.descList"></div>
+      </div>
     </section>
   </main>
 

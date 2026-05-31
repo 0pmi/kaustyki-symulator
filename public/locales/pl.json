@@ -11,7 +11,7 @@
   },
   "snell": {
     "title": "1. Załamanie (Prawo Snella)",
-    "theory": "<p>Zanim zrozumiemy skomplikowane kaustyki, musimy zacząć od podstawy optyki geometrycznej. Kiedy światło przechodzi z jednego ośrodka do drugiego (np. z powietrza do szkła), zmienia swoją prędkość i kierunek. Decyduje o tym współczynnik załamania światła $n$ (z ang. <em>Index of Refraction - IOR</em>).</p><p>Matematycznie to zjawisko opisuje <strong>Prawo Snella</strong>:</p>$$n_1 \\sin(\\theta_1) = n_2 \\sin(\\theta_2)$$<p>Gdzie $n_1$ i $n_2$ to współczynniki załamania obu ośrodków, a $\\theta_1$ i $\\theta_2$ to kąty padania i załamania mierzone względem osi normalnej (prostopadłej do powierzchni granicznej).</p>",
+    "theory": "<p>Podstawowym zjawiskiem w optyce geometrycznej jest załamanie światła (refrakcja). Kiedy fala świetlna przechodzi przez granicę dwóch ośrodków o różnej gęstości optycznej, zmianie ulega jej prędkość propagacji oraz kierunek. Wielkością fizyczną charakteryzującą dany ośrodek jest współczynnik załamania światła $n$ (z ang. <em>Index of Refraction - IOR</em>).</p><p>Matematyczny model tego zjawiska definiuje <strong>Prawo Snella</strong>:</p>$$n_1 \\sin(\\theta_1) = n_2 \\sin(\\theta_2)$$<p>Gdzie $n_1$ i $n_2$ oznaczają współczynniki załamania poszczególnych ośrodków, natomiast $\\theta_1$ i $\\theta_2$ to odpowiednio kąt padania i kąt załamania, mierzone względem osi normalnej (prostej prostopadłej do powierzchni granicznej).</p>",
     "controls": {
       "title": "Parametry ośrodków",
       "angle": "Kąt padania ($\\theta_1$): ",
@@ -24,16 +24,16 @@
       "v1": "Próżnia / Powietrze",
       "v2": "Lód",
       "v3": "Woda",
-      "v4": "Szkło Crown (Typowe)",
+      "v4": "Szkło Kron (Typowe)",
       "v5": "Szkło Flint (Gęste)",
       "v6": "Diament"
     },
-    "descTitle": "📐 Analiza Modelu: Załamanie i Odbicie Wewnętrzne",
-    "descList": "<ul style=\"padding-left: 20px; margin-bottom: 0;\"><li><strong>Zjawisko:</strong> Pojedynczy promień światła przechodzi przez płaską granicę dwóch ośrodków. Kąty liczone są od pionowej, przerywanej linii (normalnej).</li><li><strong>Działanie modelu:</strong> Zmieniając współczynniki obu ośrodków można badać, jak gęstość optyczna wpływa na kierunek promienia. Jeśli światło przechodzi z ośrodka rzadszego do gęstszego (np. powietrze -> szkło), promień \"przygina się\" do normalnej.</li><li><strong>Całkowite Odbicie Wewnętrzne (TIR):</strong> Ustaw Ośrodek Górny na gęstszy (np. 1.52), a Dolny na rzadszy (1.00). Zwiększając kąt padania, w pewnym momencie promień nie będzie w stanie wejść do dolnego ośrodka i w 100% odbije się od granicy jak od idealnego lustra. Na tym zjawisku opiera się działanie światłowodów!</li></ul>"
+    "descTitle": "Analiza Zjawiska: Załamanie i Odbicie Wewnętrzne",
+    "descList": "<p>Zjawisko załamania i odbicia można analizować poprzez modyfikację gęstości optycznej ośrodków oraz kąta padania fali świetlnej:</p><p>&#8226; <strong>Geometria załamania:</strong> Przejście promienia z ośrodka rzadszego do gęstszego optycznie (np. powietrze &rarr; szkło) powoduje załamanie promienia w kierunku normalnej. W odwrotnej sytuacji promień odchyla się od normalnej.</p><p>&#8226; <strong>Całkowite Odbicie Wewnętrzne (TIR):</strong> Gdy światło przechodzi z ośrodka gęstszego do rzadszego, istnieje graniczny kąt padania, po przekroczeniu którego załamanie staje się niemożliwe. Światło ulega wówczas w stu procentach odbiciu od granicy ośrodków, zachowując się jak przy kontakcie z idealnym zwierciadłem. Na zjawisku tym opiera się m.in. działanie współczesnych światłowodów.</p>"
   },
   "lens": {
     "title": "2. Skupienie (Soczewka)",
-    "theory": "<p>W uproszczonej, szkolnej fizyce uczymy się, że soczewki skupiają wszystkie promienie w jednym, idealnym punkcie zwanym ogniskiem. Rzeczywistość jest jednak inna. Soczewki sferyczne (o przekroju opartym na geometrii koła) cierpią na wadę zwaną <strong>aberracją sferyczną</strong>.</p><p>Promienie brzeżne, biegnące dalej od osi optycznej, padają na soczewkę pod większym kątem i zgodnie z prawem Snella załamują się znacznie silniej niż promienie blisko środka. Zamiast jednego ogniska powstaje rozmyty obszar, a przecinające się promienie tworzą jasną obwiednię – to właśnie nasza pierwsza kaustyka załamania.</p>",
+    "theory": "<p>Wyidealizowane modele optyczne zakładają, że soczewki skupiają równoległe wiązki promieni w jednym, precyzyjnym punkcie zwanym ogniskiem. W rzeczywistości soczewki sferyczne wykazują wadę optyczną określaną jako <strong>aberracja sferyczna</strong>.</p><p>Promienie świetlne padające na brzegowe obszary soczewki (dalej od osi optycznej) trafiają na powierzchnię pod większym kątem. Zgodnie z prawem Snella ulegają one silniejszemu załamaniu niż promienie biegnące bliżej środka. W efekcie wspólne ognisko ulega rozmyciu, a przecinające się promienie tworzą na płaszczyźnie charakterystyczną, świetlną obwiednię – kaustykę refrakcyjną.</p>",
     "controls": {
       "title": "Parametry symulacji",
       "lightY": "Pozycja światła Y: ",
@@ -46,28 +46,28 @@
       "v1": "Powietrze",
       "v2": "Woda",
       "v3": "Oliwa z oliwek",
-      "v4": "Szkło (Crown)",
+      "v4": "Szkło (Kron)",
       "v5": "Szafir",
       "v6": "Diament"
     },
-    "descTitle": "🔍 Analiza Modelu: Załamanie w Soczewce",
-    "descList": "<ul style=\"padding-left: 20px; margin-bottom: 0;\"><li><strong>Zjawisko:</strong> Symulator prezentuje aberrację sferyczną. Zwróć uwagę, że promienie na krawędziach soczewki załamują się pod ostrzejszym kątem niż te blisko środka, tworząc jasną obwiednię kaustyki zamiast jednego, idealnego punktu (ogniska).</li><li><strong>Jak używać:</strong> Zmieniaj kąt padania światła, aby zobaczyć, jak ognisko i kształt kaustyki przemieszczają się i deformują. Regulacja IOR pokaże Ci różnicę między słabą soczewką (np. woda) a silną (np. diament).</li><li><strong>Uproszczenia modelu:</strong> Model zakłada wyidealizowaną, nieskończenie gładką soczewkę w przestrzeni 2D. Użyto w nim światła monochromatycznego (jednobarwnego) – w rzeczywistości światło białe uległoby tu dodatkowo dyspersji (aberracji chromatycznej), rozmywając kaustykę w tęczę.</li></ul>"
+    "descTitle": "Analiza Zjawiska: Aberracja Sferyczna",
+    "descList": "<p>Właściwości optyczne soczewki sferycznej zależą bezpośrednio od jej geometrii oraz zastosowanego materiału:</p><p>&#8226; <strong>Krzywa kaustyczna:</strong> Brak wspólnego punktu skupienia dla wszystkich promieni uniemożliwia uzyskanie ostrego obrazu. Rozkład natężenia światła formuje zauważalną obwiednię, której kształt zależy od parametrów soczewki.</p><p>&#8226; <strong>Zależność od gęstości optycznej:</strong> Materiały o wyższym współczynniku IOR (np. diament) wykazują silniejsze właściwości załamujące. Skutkuje to skróceniem ogniskowej i przesunięciem kaustyki bliżej samej soczewki, w przeciwieństwie do materiałów o niższym współczynniku (np. woda).</p><p><strong>Założenia i uproszczenia modelu:</strong><br>Symulacja prezentuje wyidealizowaną, gładką soczewkę w układzie dwuwymiarowym, wykorzystującą światło monochromatyczne (jednobarwne). W rzeczywistości użycie białego światła słonecznego doprowadziłoby do nałożenia się na siebie kolejnego zjawiska – aberracji chromatycznej (dyspersji), co skutkowałoby dodatkowym, barwnym rozmyciem na krawędziach kaustyki.</p>"
   },
   "cup": {
     "title": "3. Odbicie (Nefroida)",
-    "theory": "<p>Kaustyki powstają nie tylko przez załamanie, ale też przez odbicie (refleksję). Zjawisko to opisuje prosta zasada: kąt padania jest równy kątowi odbicia. W grafice komputerowej promień odbity $\\vec{R}$ wyliczamy za pomocą wektora wchodzącego $\\vec{D}$ i wektora normalnego powierzchni $\\vec{n}$:</p>$$\\vec{R} = \\vec{D} - 2(\\vec{D} \\cdot \\vec{n})\\vec{n}$$<p>Gdzie symbol $\\cdot$ oznacza iloczyn skalarny wektorów. Klasycznym przykładem kaustyki odbiciowej jest wzór przypominający serce w kubku kawy. Promienie uderzając o lustrzane wnętrze kubka, tworzą na płynie matematyczną krzywą zwaną nefroidą (potocznie krzywą nerkową, będącą odmianą epicykloidy).</p>",
+    "theory": "<p>Kaustyki powstają nie tylko przez załamanie, ale też przez odbicie (refleksję). Zjawisko to opisuje prosta zasada: kąt padania jest równy kątowi odbicia. W grafice komputerowej promień odbity $\\vec{R}$ wyliczamy za pomocą wektora wchodzącego $\\vec{D}$ i wektora normalnego powierzchni $\\vec{n}$:</p>$$\\vec{R} = \\vec{D} - 2(\\vec{D} \\cdot \\vec{n})\\vec{n}$$<p>Gdzie symbol $\\cdot$ oznacza iloczyn skalarny wektorów. Zastanawiałeś się kiedyś, skąd bierze się świetliste \"serce\" na dnie kubka z kawą, gdy pada na niego słońce? To właśnie kaustyka odbiciowa. Kiedy równoległe promienie słoneczne wpadają do cylindrycznego naczynia, nie skupiają się w jednym idealnym punkcie. Zamiast tego odbijają się pod różnymi kątami, krzyżując się ze sobą i tworząc na dnie charakterystyczny świetlisty wzór. Matematycy nazywają ten kształt nefroidą (od greckiego nephros – nerka), a generuje się on zaledwie z jednego, prostego równania wektorowego.</p>",
     "controls": {
       "title": "Parametry odbicia",
       "lightX": "Pozycja światła X: ",
       "rayCount": "Ilość promieni: "
     },
-    "tip": "[Wskazówka dydaktyczna: Zmieniaj liczbę promieni by zaobserwować jak niektóre z nich pokrywają się lub przecinają w konkretnych miejscach. Najjaśniejsze punkty to miejsca, w których liczba promieni jest największa, wynikiem czego są charakterystyczne kształty na dnie szklanki.]",
-    "descTitle": "☕ Analiza Modelu: Odbicie w Cylindrze",
-    "descList": "<ul style=\"padding-left: 20px; margin-bottom: 0;\"><li><strong>Zjawisko:</strong> Równoległe promienie świetlne wpadają do cylindrycznego naczynia. Zamiast skupiać się w jednym punkcie, po odbiciu od wewnętrznej krzywizny krzyżują się, formując wyraźną, jasną krawędź – kaustykę odbiciową w kształcie nefroidy.</li><li><strong>Działanie modelu:</strong> Zmiana wartości na suwaku symuluje obrót wektora kierunkowego promieni słonecznych (np. wędrówkę słońca po niebie). Promienie startują z zewnątrz, przenikają przez przednią ściankę naczynia i ulegają odbiciu dopiero przy kontakcie z wklęsłą, tylną powierzchnią lustrzaną.</li><li><strong>Uproszczenia modelu:</strong> Symulacja odbywa się w płaskim rzucie 2D. Założono idealnie zwierciadlaną ściankę wewnętrzną oraz pominięto zjawisko załamania światła na granicy powietrze-płyn. W rzeczywistości zawsze występuje częściowe rozproszenie światła, przez co obserwowana kaustyka ma nieco bardziej miękkie kontury.</li></ul>"
+    "tip": "<strong>Zrób to sam:</strong> Zmniejsz suwak \"Ilość promieni\" do kilku sztuk. Przeanalizuj tor każdego z nich z osobna – zauważ, jak odbijają się od ścianki z zachowaniem zasady \"kąt padania = kąt odbicia\". Następnie płynnie zwiększaj ich liczbę. Zobaczysz, jak pojedyncze, przecinające się linie układają się w ciągłą, gęstą krzywą – to jest właśnie moment narodzin kaustyki!",
+    "descTitle": "Jak to działa w przeglądarce?",
+    "descList": "Suwak kąta światła symuluje wędrówkę słońca po niebie. Kiedy go przesuwasz, zmieniasz kąt padania całego frontu falowego (reprezentowanego przez zbiór równoległych wektorów kierunkowych).\n\nW celach edukacyjnych, nasza symulacja 2D stosuje jedno duże uproszczenie: ignorujemy załamanie światła przy wchodzeniu do naczynia. Traktujemy ścianki kubka jako szkło całkowicie przezroczyste na wylot, skupiając się wyłącznie na perfekcyjnym, zwierciadlanym odbiciu światła, gdy uderzy w jego tylną, wklęsłą krawędź. W prawdziwym świecie zjawisko to wygląda na nieco bardziej \"rozmyte\" ze względu na niedoskonałości kształtu naczyń oraz dodatkowe załamywanie się światła na styku powietrza z kawą."
   },
   "prism": {
     "title": "4. Dyspersja (Tęcza)",
-    "theory": "<p>Aby zrozumieć tęczę, musimy poznać zjawisko <strong>dyspersji</strong>. Współczynnik załamania światła $n$ zależy od długości fali światła $\\lambda$. Krótsze fale (fioletowe) załamują się silniej niż fale długie (czerwone).</p><p>Zależność tę przybliża empiryczne <strong>Równanie Cauchy'ego</strong>:</p>$$n(\\lambda) = A + \\frac{B}{\\lambda^2}$$<p>W kropli deszczu światło słoneczne wnika do środka (rozszczepiając się), odbija się od tylnej ścianki i wychodzi, tworząc kaustykę pod kątem około $42^\\circ$. To ona tworzy widoczny na niebie łuk tęczy!</p>",
+    "theory": "<p>Aby zrozumieć tęczę, musimy poznać zjawisko dyspersji. Współczynnik załamania światła $n$ nie jest stałą – zależy od długości fali światła $\\lambda$. Krótsze fale (fioletowe i niebieskie) \"hamują\" w wodzie odrobinę bardziej i załamują się silniej niż fale długie (czerwone).Zależność tę przybliża empiryczne Równanie Cauchy'ego:$$n(\\lambda)=A+\\frac{B}{\\lambda^2}$$W kropli deszczu białe światło słoneczne wnika do środka (ulegając rozszczepieniu), odbija się od jej tylnej ścianki i wychodzi, tworząc barwną kaustykę pod kątem około 42 stopni. Kiedy zjawisko to zachodzi w milionach kropel jednocześnie, na niebie zapala się łuk tęczy.</p>",
     "controls": {
       "title": "Parametry dyspersji",
       "rayCount": "Ilość promieni: ",
@@ -75,13 +75,36 @@
       "medium": "Ośrodek: <strong>Woda (Kropla deszczu)</strong>",
       "mediumDesc": "Współczynnik załamania dla wody nie jest jedną liczbą. Zmienia się od 1.331 (dla światła czerwonego) do 1.343 (dla światła fioletowego). To właśnie ta minimalna różnica tworzy tęczę!"
     },
-    "tip": "[Wskazówka dydaktyczna: Zmieniając ilość wyświetlanych promieni zauważ jak rozszczepione kolory kumulują się w wąskim paśmie tworząc kolory tęczy, a w pozostałych miejscach mieszają, tworząc światło białe.]",
-    "descTitle": "💧 Analiza Modelu: Tęcza Pierwotna w Kropli",
-    "descList": "<ul style=\"padding-left: 20px; margin-bottom: 0;\"><li><strong>Zjawisko:</strong> Światło wchodzi do wnętrza kropli (1. załamanie i rozszczepienie), odbija się całkowicie od jej tylnej ścianki, a następnie wychodzi na zewnątrz (2. załamanie). Na dole ekranu widać zagęszczony, ułożony kątowo wachlarz kolorów – to on jest powodem powstawania tęczy na niebie.</li><li><strong>Jak używać:</strong> Zwiększ ilość promieni na maksa. Zwróć uwagę, że tylko wąski zakres promieni wchodzących (tzw. strefa uderzenia Kartezjusza na wysokości około 60-95% promienia kropli) tworzy jasny, użyteczny strumień tęczy. Reszta tworzy rozproszone białe tło we wnętrzu łuku.</li><li><strong>Uproszczenia modelu:</strong> Prawdziwa różnica IOR dla wody między barwą czerwoną a fioletową to zaledwie ~0.012, co daje różnicę kąta wyjścia wielkości zaledwie 2 stopni. W prezentowanym modelu sztucznie rozciągnięto tę różnicę, aby zjawisko separacji barw było wyraźnie czytelne na ekranie monitora.</li></ul>"
+  "tip": "<strong>Zrób to sam:</strong> Ustaw suwak \"Ilość promieni\" na zaledwie kilka sztuk. Następnie bardzo powoli przesuwaj suwak kąta padania od lewej do prawej. Zauważysz, że w jednym, konkretnym punkcie rozmyte kolory nagle się zagęszczają, tworząc ostrą jak brzytwa, odseparowaną wiązkę. To właśnie w tym miejscu (pod kątem minimalnego odchylenia) rodzi się Promień Kartezjusza!",
+  "descTitle": "Analiza Zjawiska: Anatomia Tęczy",
+  "descList": "<p>Zwiększenie liczby promieni do maksimum symuluje pełne nasłonecznienie kropli. Badając różne strefy padania światła, można zaobserwować pełen przekrój zjawisk optycznych:</p><p>&#8226; <strong>Jasne tło pod tęczą:</strong> Promienie uderzające blisko środka kropli przelatują przez nią i ulegają rozproszeniu. Wyjaśnia to, dlaczego niebo pod głównym łukiem tęczy wydaje się zawsze jaśniejsze.</p><p>&#8226; <strong>Tęcza pierwotna:</strong> W strefie uderzenia Kartezjusza wiązka ulega potężnemu zagęszczeniu po jednym odbiciu wewnętrznym, tworząc wyraźny, główny łuk tęczy.</p><p>&#8226; <strong>Pas Aleksandra:</strong> Pomiędzy strefą tęczy pierwotnej a wtórnej znajduje się zakres kątów, z których w kierunku obserwatora nie wracają żadne spójne promienie. Na prawdziwym niebie (gdzie słońce oświetla całą kroplę naraz) zjawisko to tworzy wyraźny, ciemny pas oddzielający oba łuki.</p><p>&#8226; <strong>Tęcza wtórna:</strong> Światło padające na przeciwległą część kropli formuje wiązkę o <em>odwróconych</em> kolorach (fiolet na górze, czerwień na dole). Powstaje ona z ułamka promieni, którym udało się odbić wewnątrz kropli aż dwa razy.</p><p><strong>Uproszczenia modelu a równanie Cauchy'ego</strong><br>We wzorze matematycznym stała $A$ to bazowy współczynnik załamania dla danego ośrodka, natomiast $B$ to tzw. współczynnik dyspersji, który determinuje siłę rozszczepienia barw. W prawdziwej wodzie różnica wartości $n$ między barwą czerwoną a fioletową wynosi zaledwie <strong>0.012</strong>, co daje rozszczepienie kątowe o szerokości jedynie ~2 stopni. Gdyby wdrożono twarde dane fizyczne, tęcza na ekranie byłaby trudną do dostrzeżenia nitką.</p><p>W prezentowanym modelu celowo powiększono wartość parametru $B$, sztucznie rozciągając zjawisko dyspersji. Dzięki temu mechanizm separacji poszczególnych długości fal jest od razu wyraźnie widoczny na ekranie.</p>"
+
   },
   "gpu": {
-    "title": "5. Oświetlenie Globalne (Symulacja 3D)",
-    "theory": "W przeciwieństwie do naszych analitycznych modeli 2D, nowoczesne silniki graficzne używają potężnych kart graficznych (GPU), aby symulować miliony promieni jednocześnie."
+    "title": "5. Oświetlenie Globalne i Kaustyki (Symulacja 3D)",
+    "theory": "<p>Dotychczasowe modele opierały się na analitycznym śledzeniu geometrii pojedynczych promieni w izolowanym układzie 2D. W środowisku trójwymiarowym zjawiska optyczne stają się nieporównywalnie bardziej złożone. Granica ośrodków (np. powierzchnia wody) rzadko bywa idealnie płaska – jest to struktura dynamiczna. Każda pojedyncza fala działa jak asymetryczna, płynna soczewka, która w ułamku sekundy skupia i rozprasza przechodzące przez nią światło.</p><p>Aby odtworzyć te zachowania w czasie rzeczywistym konieczne jest uwzględnienie trajektorii niezliczonej liczby promieni. Zjawisko to ilustruje, jak elementarne prawa optyki, zachodzące masowo na całej powierzchni cieczy, generują złożone, wielowymiarowe struktury świetlne.</p>",
+    "descTitle": "Analiza Zjawiska: Złożone Układy Optyczne",
+    "descList": "<p>Odtworzenie środowiska 3D pozwala na jednoczesną obserwację wielu zjawisk optycznych omówionych w poprzednich działach:</p><p>&#8226; <strong>Dynamiczne kaustyki refrakcyjne:</strong> Pofalowana powierzchnia cieczy działa jak nieskończona siatka ruchomych mikrosoczewek. Zjawisko aberracji sferycznej (widoczne wcześniej w pojedynczej soczewce) występuje tu masowo, tworząc na dnie basenu gęstą, nieustannie zmieniającą się sieć jasnych krzywych skupienia oraz ciemnych obszarów niedoświetlonych.</p><p>&#8226; <strong>Złożone załamanie obrazu:</strong> Kształt zanurzonej w wodzie kuli ulega wizualnej dystorsji. Promienie świetlne odbite od obiektu załamują się przy wyjściu z wody na nierównomiernej powierzchni fal, w pełni zgodnie z trójwymiarowym zastosowaniem Prawa Snella.</p><p>&#8226; <strong>Aberracja chromatyczna na dnie:</strong> Podobnie jak w przypadku zjawiska tęczy, woda wykazuje zależność współczynnika załamania od długości fali światła. Skutkuje to dyspersją na obrzeżach skupionych wiązek świetlnych (szczególnie zauważalną na najjaśniejszych pasmach kaustyk), generując charakterystyczne, barwne obwódki.</p><p>&#8226; <strong>Optymalizacja obliczeniowa:</strong> Fizycznie poprawne śledzenie milionów fotonów (ang. <em>Ray Tracing / Path Tracing</em>) jest procesem niezwykle obciążającym dla układów logicznych. W interaktywnych aplikacjach 3D efekty te symuluje się za pomocą wyspecjalizowanych programów cieniujących (tzw. shaderów), które przy wykorzystaniu mocy równoległej układów GPU obliczają przybliżone tory światła i generują tekstury kaustyk w czasie rzędu milisekund.</p>",
+    "guiTitle": "Parametry Symulacji",
+    "lightFolder": "Oświetlenie i Cienie",
+    "ambientShadow": "Gęstość Cienia",
+    "sunElev": "Wysokość Słońca",
+    "sunAzim": "Kąt Słońca (Azymut)",
+    "sunInt": "Jasność Słońca",
+    "opticsFolder": "Optyka Wody",
+    "ior": "Współczynnik Załamania (IOR)",
+    "volFolder": "Kolor Wody (Pochłanianie światła)",
+    "absR": "Czerwony",
+    "absG": "Zielony",
+    "absB": "Niebieski",
+    "sphereFolder": "Fizyka Piłki",
+    "buoyancy": "Siła Wyporności",
+    "btnLight": "Ustaw Słońce na Kamerę (L)",
+    "btnGravity": "Przełącz Grawitację (G)",
+    "btnLight": "Ustaw Słońce na Kamerę (L)",
+    "btnGravity": "Przełącz Grawitację (G)",
+    "radius": "Rozmiar Piłki",
+    "btnPause": "Pauza / Wznowienie (P)"
   },
-  "footer": "Stworzone w ramach projektu z Fizyki. Licencja MIT."
+  "footer": "Projekt stworzony w ramach wykładu Fizyka na wydziale Informatyki i Telekomunikacji PWr. Licencja MIT 2026. Autor: Krzysztof Cyran"
 }

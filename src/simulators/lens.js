@@ -1,9 +1,70 @@
 /**
- * @fileoverview Simulates spherical aberration in a circular lens
- * using sequential ray tracing and Snell's Law.
+ * @fileoverview Simulates spherical aberration through a realistic
+ * bi-convex glass lens using monochromatic ray tracing and Snell's Law.
  */
 
-import { vec, intersectCircle, refract } from '../utils/math.js';
+// --- 1. INTERNAL MATH UTILITIES ---
+// Isolated math module ensuring rock-solid vector operations and intersections.
+const MathUtils = {
+    add: (a, b) => ({ x: a.x + b.x, y: a.y + b.y }),
+    sub: (a, b) => ({ x: a.x - b.x, y: a.y - b.y }),
+    mul: (v, s) => ({ x: v.x * s, y: v.y * s }),
+    mag: (v) => Math.sqrt(v.x * v.x + v.y * v.y),
+    normalize: (v) => {
+        const m = MathUtils.mag(v);
+        return m === 0 ? { x: 0, y: 0 } : { x: v.x / m, y: v.y / m };
+    },
+    dot: (a, b) => a.x * b.x + a.y * b.y,
+
+    /**
+     * Calculates the reflection vector (used for Total Internal Reflection).
+     */
+    reflect: (incident, normal) => {
+        const dot = MathUtils.dot(incident, normal);
+        return MathUtils.sub(incident, MathUtils.mul(normal, 2.0 * dot));
+    },
+
+    /**
+     * Finds the closest positive intersection distance (t) between a ray and a circle.
+     */
+    intersectCircle: (ro, rd, center, radius) => {
+        const oc = MathUtils.sub(ro, center);
+        const b = MathUtils.dot(oc, rd);
+        const c = MathUtils.dot(oc, oc) - radius * radius;
+        const delta = b * b - c;
+
+        if (delta > 0) {
+            const sqrtDelta = Math.sqrt(delta);
+            const t1 = -b - sqrtDelta;
+            const t2 = -b + sqrtDelta;
+
+            // Return the first valid forward intersection
+            if (t1 > 1e-4) return t1;
+            if (t2 > 1e-4) return t2;
+        }
+        return null;
+    },
+
+    /**
+     * Calculates the refracted directional vector based on Snell's Law.
+     * @param {Object} incident - Normalized incoming ray direction.
+     * @param {Object} normal - Normalized surface normal pointing against the ray.
+     * @param {number} eta - Ratio of indices of refraction (n1 / n2).
+     */
+    refract: (incident, normal, eta) => {
+        const cosi = -MathUtils.dot(incident, normal);
+        const sin2t = eta * eta * (1.0 - cosi * cosi);
+
+        // Handle Total Internal Reflection (TIR)
+        if (sin2t > 1.0) return null;
+
+        const cost = Math.sqrt(1.0 - sin2t);
+        return MathUtils.add(
+            MathUtils.mul(incident, eta),
+            MathUtils.mul(normal, eta * cosi - cost)
+        );
+    }
+};
 
 export function initLensSimulation() {
     const canvasLens = document.getElementById('canvas-lens');
@@ -20,8 +81,7 @@ export function initLensSimulation() {
     };
 
     /**
-     * Main render loop. Traces rays from a point source through
-     * a spherical boundary and computes sequential refractions.
+     * Core render loop. Updates physics and draws the current frame.
      */
     function drawLensSimulation() {
         ctxLens.globalCompositeOperation = 'source-over';
@@ -34,82 +94,128 @@ export function initLensSimulation() {
             lightX: 50
         };
 
-        const circleCenter = { x: canvasLens.width * 0.35, y: canvasLens.height / 2 };
-        const circleRadius = 130;
+        // --- 2. BI-CONVEX LENS DEFINITION ---
+        // A realistic lens constructed from the intersection of two overlapping circles.
+        const lensCenter = { x: canvasLens.width * 0.33, y: canvasLens.height / 2 };
+        const lensRadius = 130;
+        const lensOffset = 100;
+
+        // C1 defines the LEFT surface (center is on the right)
+        const C1 = { x: lensCenter.x + lensOffset, y: lensCenter.y };
+        // C2 defines the RIGHT surface (center is on the left)
+        const C2 = { x: lensCenter.x - lensOffset, y: lensCenter.y };
+
         const lightSource = { x: config.lightX, y: config.lightY };
 
-        // 1. Render the physical lens boundary
+        // Render physical glass geometry
+        const lensAngle = Math.acos(lensOffset / lensRadius);
         ctxLens.beginPath();
-        ctxLens.arc(circleCenter.x, circleCenter.y, circleRadius, 0, 2 * Math.PI);
-        ctxLens.strokeStyle = 'rgba(74, 144, 226, 0.5)';
-        ctxLens.fillStyle = 'rgba(74, 144, 226, 0.05)';
-        ctxLens.lineWidth = 2;
+        ctxLens.arc(C1.x, C1.y, lensRadius, Math.PI - lensAngle, Math.PI + lensAngle); // Left arc
+        ctxLens.arc(C2.x, C2.y, lensRadius, -lensAngle, lensAngle); // Right arc
+        ctxLens.closePath();
+
+        ctxLens.fillStyle = 'rgba(74, 144, 226, 0.1)';
         ctxLens.fill();
+        ctxLens.strokeStyle = 'rgba(74, 144, 226, 0.6)';
+        ctxLens.lineWidth = 2;
         ctxLens.stroke();
 
-        // 2. Render the point light source
+        // Render point light source
         ctxLens.beginPath();
-        ctxLens.arc(lightSource.x, lightSource.y, 8, 0, 2 * Math.PI);
-        ctxLens.fillStyle = '#f1c40f';
+        ctxLens.arc(lightSource.x, lightSource.y, 6, 0, 2 * Math.PI);
+        ctxLens.fillStyle = '#ffffff';
+        ctxLens.shadowBlur = 15;
+        ctxLens.shadowColor = '#4cd137'; // Glow matches the monochromatic ray color
         ctxLens.fill();
+        ctxLens.shadowBlur = 0;
 
-        // Additive blending for energy accumulation (caustic approximation)
-        ctxLens.globalCompositeOperation = 'lighter';
-        const spreadAngle = Math.PI / 4;
-        const startAngle = -spreadAngle / 2;
+        // --- 3. DYNAMIC AIMING MATH ---
+        // Automatically calculates the perfect angular spread to hit the entire lens surface
+        const targetVector = MathUtils.sub(lensCenter, lightSource);
+        const distanceToLens = MathUtils.mag(targetVector);
+        const baseAngle = Math.atan2(targetVector.y, targetVector.x);
+
+        const lensHalfHeight = Math.sqrt(lensRadius * lensRadius - lensOffset * lensOffset);
+
+        // Scale by 0.98 to prevent boundary precision errors on extreme edges
+        const spreadAngle = 2 * Math.asin(lensHalfHeight / distanceToLens) * 0.98;
+        const startAngle = baseAngle - spreadAngle / 2;
+
+        ctxLens.globalCompositeOperation = 'lighter'; // Additive blending for caustics
+
+        // --- 4. MONOCHROMATIC RAYTRACING ---
+        // Classic "optical green" laser color for high contrast
+        ctxLens.strokeStyle = 'rgba(76, 209, 55, 0.15)';
+        ctxLens.lineWidth = 1.5;
 
         for (let i = 0; i < config.rayCount; i++) {
             const angle = startAngle + (i / (config.rayCount - 1 || 1)) * spreadAngle;
-            let rayDir = { x: Math.cos(angle), y: Math.sin(angle) };
-            let rayPos = { x: lightSource.x, y: lightSource.y };
+            const rayDir = { x: Math.cos(angle), y: Math.sin(angle) };
+            const rayPos = lightSource;
 
-            const t1 = intersectCircle(rayPos, rayDir, circleCenter, circleRadius);
+            // 1st Intersect: Air -> Glass (Entering Left surface, C1)
+            const t1 = MathUtils.intersectCircle(rayPos, rayDir, C1, lensRadius);
 
             if (t1) {
-                const hit1 = vec.add(rayPos, vec.mul(rayDir, t1));
+                const hit1 = MathUtils.add(rayPos, MathUtils.mul(rayDir, t1));
+
+                // Draw incoming ray
                 ctxLens.beginPath();
                 ctxLens.moveTo(rayPos.x, rayPos.y);
                 ctxLens.lineTo(hit1.x, hit1.y);
+                ctxLens.stroke();
 
-                const normal1 = vec.normalize(vec.sub(hit1, circleCenter));
+                // Normal pointing outwards from C1 towards the light
+                const normal1 = MathUtils.normalize(MathUtils.sub(hit1, C1));
+                const refractedDir1 = MathUtils.refract(rayDir, normal1, 1.0 / config.ior);
 
-                // First refraction: entry into denser medium (air -> glass)
-                const refractedDir1 = refract(rayDir, normal1, 1.0 / config.ior);
-
-                let finalHit = null;
                 if (refractedDir1) {
-                    const t2 = intersectCircle(hit1, refractedDir1, circleCenter, circleRadius);
+                    // 2nd Intersect: Glass -> Air (Exiting Right surface, C2)
+                    const t2 = MathUtils.intersectCircle(hit1, refractedDir1, C2, lensRadius);
+
                     if (t2) {
-                        const hit2 = vec.add(hit1, vec.mul(refractedDir1, t2));
+                        const hit2 = MathUtils.add(hit1, MathUtils.mul(refractedDir1, t2));
+
+                        // Draw internal ray
+                        ctxLens.beginPath();
+                        ctxLens.moveTo(hit1.x, hit1.y);
                         ctxLens.lineTo(hit2.x, hit2.y);
+                        ctxLens.stroke();
 
-                        // Normal vector must point inward for exit boundary
-                        const normal2 = vec.mul(vec.normalize(vec.sub(hit2, circleCenter)), -1);
-
-                        // Second refraction: exit into sparser medium (glass -> air)
-                        const refractedDir2 = refract(refractedDir1, normal2, config.ior / 1.0);
+                        // Normal pointing INTO the glass for the exit calculation
+                        const normal2 = MathUtils.normalize(MathUtils.sub(C2, hit2));
+                        const refractedDir2 = MathUtils.refract(refractedDir1, normal2, config.ior / 1.0);
 
                         if (refractedDir2) {
-                            const rayEnd = vec.add(hit2, vec.mul(refractedDir2, 1200));
+                            // Standard exit refraction
+                            const rayEnd = MathUtils.add(hit2, MathUtils.mul(refractedDir2, 1000));
+
+                            ctxLens.beginPath();
+                            ctxLens.moveTo(hit2.x, hit2.y);
                             ctxLens.lineTo(rayEnd.x, rayEnd.y);
-                            finalHit = hit2;
+                            ctxLens.stroke();
+                        } else {
+                            // Total Internal Reflection (TIR) fallback
+                            // If the exit angle is too extreme, the ray bounces internally
+                            const reflectedDir = MathUtils.reflect(refractedDir1, normal2);
+                            const t3 = MathUtils.intersectCircle(hit2, reflectedDir, C1, lensRadius);
+
+                            if (t3) {
+                                const hit3 = MathUtils.add(hit2, MathUtils.mul(reflectedDir, t3));
+                                ctxLens.beginPath();
+                                ctxLens.moveTo(hit2.x, hit2.y);
+                                ctxLens.lineTo(hit3.x, hit3.y);
+
+                                // Draw reflected internal rays slightly dimmer
+                                ctxLens.globalAlpha = 0.5;
+                                ctxLens.stroke();
+                                ctxLens.globalAlpha = 1.0;
+                            }
                         }
                     }
                 }
-
-                ctxLens.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-                ctxLens.stroke();
-
-                // Optional photon termination highlight
-                if (finalHit) {
-                    ctxLens.beginPath();
-                    ctxLens.arc(finalHit.x, finalHit.y, 1.5, 0, 2 * Math.PI);
-                    ctxLens.fillStyle = 'rgba(255, 255, 255, 0.04)';
-                    ctxLens.fill();
-                }
             }
         }
-
         ctxLens.globalCompositeOperation = 'source-over';
     }
 
@@ -119,11 +225,13 @@ export function initLensSimulation() {
         drawLensSimulation();
     }
 
+    // Attach event listeners to UI controls
     ['input'].forEach(evt => {
         lensSliders.ray?.addEventListener(evt, updateLensUI);
         lensSliders.ior?.addEventListener(evt, updateLensUI);
         lensSliders.lightY?.addEventListener(evt, updateLensUI);
     });
 
+    // Initial render
     drawLensSimulation();
 }

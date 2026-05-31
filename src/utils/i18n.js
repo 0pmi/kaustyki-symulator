@@ -3,7 +3,10 @@ export class I18n {
         this.lang = defaultLang;
         this.translations = {};
     }
-
+    t(key) {
+        const text = key.split('.').reduce((obj, i) => (obj ? obj[i] : null), this.translations);
+        return text || key;
+    }
     async loadTranslations(lang) {
         try {
             const response = await fetch(`${import.meta.env.BASE_URL}locales/${lang}.json`);

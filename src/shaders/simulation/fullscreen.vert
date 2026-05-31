@@ -1,6 +1,6 @@
-/**
- * Basic vertex shader for full-screen quad rendering.
- * Used exclusively for FBO processing.
+/*
+ * Minimal vertex shader for full-screen quad rendering.
+ * Used strictly for GPGPU ping-pong processing where geometry perspective is irrelevant.
  */
 varying vec2 vUv;
 
