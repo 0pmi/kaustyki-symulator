@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "Encyklopedia Kaustyk"
+    "title": "Kaustyki"
   },
   "intro": {
     "title": "Optyka i Kaustyki",
@@ -73,6 +73,7 @@
       "rayCount": "Ilość promieni: ",
       "angle": "Kąt padania światła: ",
       "medium": "Ośrodek: <strong>Woda (Kropla deszczu)</strong>",
+      "width": "Szerokość wiązki",
       "mediumDesc": "Współczynnik załamania dla wody nie jest jedną liczbą. Zmienia się od 1.331 (dla światła czerwonego) do 1.343 (dla światła fioletowego). To właśnie ta minimalna różnica tworzy tęczę!"
     },
   "tip": "<strong>Zrób to sam:</strong> Ustaw suwak \"Ilość promieni\" na zaledwie kilka sztuk. Następnie bardzo powoli przesuwaj suwak kąta padania od lewej do prawej. Zauważysz, że w jednym, konkretnym punkcie rozmyte kolory nagle się zagęszczają, tworząc ostrą jak brzytwa, odseparowaną wiązkę. To właśnie w tym miejscu (pod kątem minimalnego odchylenia) rodzi się Promień Kartezjusza!",
