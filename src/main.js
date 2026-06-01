@@ -74,18 +74,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     initCupSimulation();
     initPrismSimulation();
 
-    // 4. Initialize Advanced 3D Caustics and Fluid Simulation Environment
+// 4. Initialize Advanced 3D Caustics and Fluid Simulation Environment
     const container = document.getElementById('three-container');
     if (container) {
-        // Hardware acceleration safety gate to prevent software rendering lockups
+        // Hardware acceleration safety gate
         if (!isHardwareAcceleratedWebGLAvailable()) {
             renderWebGLFallback(container);
-            // Force an immediate translation update on the newly injected fallback DOM elements
             i18n.updateDOM();
         } else {
-            // Proceed with heavy WebGL initialization only if a capable GPU is detected
-            const app = new SimulationApp(container, i18n);
-            app.start();
+            let app = null;
+
+            // Utilize IntersectionObserver to defer WebGL initialization and halt the render loop when off-screen
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // The container is entering the viewport (or within the root margin)
+                        if (!app) {
+                            // Initial intersection: Instantiate the application and pre-warm shaders
+                            app = new SimulationApp(container, i18n);
+                            app.start();
+                        } else {
+                            // Subsequent intersections: Resume the main rendering loop
+                            app.engine.start();
+                        }
+                    } else {
+                        // The container has exited the viewport
+                        if (app && app.engine) {
+                            // Halt the requestAnimationFrame loop to conserve GPU/CPU resources
+                            app.engine.stop();
+                        }
+                    }
+                });
+            }, {
+                root: null,          // Observe relative to the browser viewport
+                rootMargin: '200px', // Pre-warm threshold to prevent visible stuttering upon scroll arrival
+                threshold: 0.0       // Trigger as soon as the margin intersects
+            });
+
+            // Commence viewport tracking
+            observer.observe(container);
         }
     }
-});
+}); // End of DOMContentLoaded listener
