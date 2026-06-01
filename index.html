@@ -17,8 +17,8 @@
     <button id="lang-pl" class="lang-btn active">PL</button>
     <button id="lang-en" class="lang-btn">EN</button>
   </div>
-  <script type="module" crossorigin src="./assets/index-BqrVIhwz.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-S32-6fuk.css">
+  <script type="module" crossorigin src="./assets/index-LcDIjNiI.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-CpQL-D7A.css">
 </head>
 <body>
 <div id="app">
@@ -236,10 +236,7 @@
           <canvas id="canvas-prism" width="800" height="600"></canvas>
         </div>
       </div>
-      <div id="simulation-loader" class="sim-loader">
-        <div class="spinner"></div>
-        <div class="loader-text" data-i18n="gpu.loading"></div>
-      </div>
+
       <div class="simulator-description" style="background: rgba(74, 144, 226, 0.1); padding: 15px; border-radius: 6px; margin-top: 20px; font-size: 0.9rem;">
         <h4 style="margin-top: 0; color: #4a90e2;" data-i18n="prism.descTitle"></h4>
         <div data-i18n="prism.descList"></div>
@@ -251,8 +248,13 @@
 
       <div class="theory-placeholder" data-i18n="gpu.theory"></div>
 
-      <div id="three-container" style="width: 100%; height: 500px; border-radius: 8px; overflow: hidden; background: #000; margin-bottom: 20px;"></div>
+      <div id="three-container" class="three-container-wrapper">
 
+        <div id="simulation-loader" class="sim-loader">
+          <div class="spinner"></div>
+          <div class="loader-text" data-i18n="gpu.loading"></div>
+        </div>
+      </div>
       <div class="simulation-analysis">
         <h3 data-i18n="gpu.descTitle"></h3>
         <div data-i18n="gpu.descList"></div>
