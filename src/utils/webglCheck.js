@@ -22,3 +22,13 @@ export function renderWebGLFallback(container) {
         </div>
     `;
 }
+
+export function renderPerformanceFallback(container) {
+    container.innerHTML = `
+        <div class="webgl-fallback-container">
+            <h3 class="webgl-fallback-title" data-i18n="gpu.perfFallbackTitle"></h3>
+            <p class="webgl-fallback-desc" data-i18n="gpu.perfFallbackDesc1"></p>
+            <p class="webgl-fallback-hint" data-i18n="gpu.perfFallbackDesc2"></p>
+        </div>
+    `;
+}

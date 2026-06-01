@@ -4,7 +4,7 @@ import {Timer} from "three";
 
 /**
  * Core rendering engine responsible for the WebGL pipeline, scene management,
- * and the main requestAnimationFrame loop.
+ * and the main requestAnimationFrame loop. Includes an active performance watchdog.
  */
 export default class Engine {
     /**
@@ -17,6 +17,13 @@ export default class Engine {
         this.timer = new Timer();
 
         this.updatables = [];
+
+        // Performance Watchdog Configuration
+        this.onPerformanceCrash = null; // Callback for SimulationApp
+        this.frameCount = 0;
+        this.consecutiveSlowFrames = 0;
+        this.maxSlowFrames = 5; // Tolerance threshold
+        this.watchdogActive = true;
 
         this._setupCamera();
         this._setupRenderer();
@@ -91,12 +98,43 @@ export default class Engine {
     }
 
     /**
-     * Starts the rendering loop.
+     * Halts the rendering loop unconditionally.
+     */
+    stop() {
+        this.renderer.setAnimationLoop(null);
+        this.watchdogActive = false;
+    }
+
+    /**
+     * Starts the rendering loop with active hardware monitoring.
      */
     start() {
         this.renderer.setAnimationLoop(() => {
             this.timer.update();
             const deltaTime = this.timer.getDelta();
+
+            // ==============================================================
+            // PERFORMANCE WATCHDOG (Hardware Overload Prevention)
+            // ==============================================================
+            if (this.watchdogActive && this.frameCount > 10 && !document.hidden) {
+                // If a frame takes between 200ms (5 FPS) and 1000ms.
+                // >1000ms is ignored as it usually means the browser tab was backgrounded.
+                if (deltaTime > 0.2 && deltaTime < 1.0) {
+                    this.consecutiveSlowFrames++;
+                    if (this.consecutiveSlowFrames >= this.maxSlowFrames) {
+                        console.error("Hardware overload detected. Halting simulation.");
+                        this.stop();
+                        if (this.onPerformanceCrash) {
+                            this.onPerformanceCrash();
+                        }
+                        return; // Abort this frame
+                    }
+                } else {
+                    // Frame was rendered in time, reset the tolerance counter
+                    this.consecutiveSlowFrames = 0;
+                }
+            }
+            this.frameCount++;
 
             this.controls.update();
 

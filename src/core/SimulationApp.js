@@ -6,6 +6,7 @@ import Environment from "../graphics/Environment.js";
 import GUI from 'lil-gui';
 import CausticsGenerator from "../graphics/CausticsGenerator.js";
 import SphereMesh from "../graphics/SphereMesh.js";
+import { renderPerformanceFallback } from "../utils/webglCheck.js";
 
 /**
  * High-level orchestrator responsible for synchronizing the physical
@@ -23,6 +24,11 @@ export default class SimulationApp {
         this.container.appendChild(this.canvas);
 
         this.engine = new Engine(this.canvas);
+        this.engine.onPerformanceCrash = () => {
+            this.dispose();
+            renderPerformanceFallback(this.container);
+            if (this.i18n) this.i18n.updateDOM();
+        };
 
         // Global environmental dimensions
         this.poolSize = 10.0;
@@ -558,6 +564,57 @@ export default class SimulationApp {
         sphereFolder.add(this._sphereParams, 'buoyancy', 0.0, 50.0).name(t('gpu.buoyancy'));
         sphereFolder.add(actions, 'toggleGravity').name(t('gpu.btnGravity'));
         sphereFolder.add(actions, 'togglePause').name(t('gpu.btnPause'));
+    }
+
+    /**
+     * Safely annihilates the entire WebGL scene, freeing VRAM and DOM resources.
+     * Crucial for graceful degradation on low-end hardware.
+     */
+    dispose() {
+        // 1. Halt the WebGL engine loop
+        this.engine.stop();
+
+        // 2. Erase the debugging GUI to prevent zombie events
+        if (this.gui) {
+            this.gui.destroy();
+        }
+
+        // 3. Deep purge of all Three.js WebGL structures from memory
+        this.engine.scene.traverse((object) => {
+            if (!object.isMesh) return;
+
+            if (object.geometry) {
+                object.geometry.dispose();
+            }
+
+            if (object.material) {
+                const materials = Array.isArray(object.material) ? object.material : [object.material];
+                materials.forEach(mat => {
+                    mat.dispose();
+                    // Purge attached native textures
+                    for (const key in mat) {
+                        const val = mat[key];
+                        if (val && val.isTexture) val.dispose();
+                    }
+                    // Purge procedural/shader uniforms
+                    if (mat.uniforms) {
+                        for (const key in mat.uniforms) {
+                            const val = mat.uniforms[key].value;
+                            if (val && val.isTexture) val.dispose();
+                        }
+                    }
+                });
+            }
+        });
+
+        // 4. Trigger explicit cleanup for custom GPGPU pipelines
+        if (this.gpgpu && typeof this.gpgpu.dispose === 'function') this.gpgpu.dispose();
+        if (this.caustics && typeof this.caustics.dispose === 'function') this.caustics.dispose();
+
+        // 5. Nuke the canvas to prevent ghost rendering and release DOM memory
+        if (this.canvas && this.canvas.parentNode) {
+            this.canvas.parentNode.removeChild(this.canvas);
+        }
     }
 
     /**
