@@ -1,6 +1,7 @@
 /**
  * @fileoverview Simulates light dispersion and rainbow formation
  * within a circular raindrop via sequential internal reflection and refraction.
+ * Focuses on primary and secondary rainbow paths (classic textbook model).
  */
 
 const MathUtils = {
@@ -53,20 +54,23 @@ export function initPrismSimulation() {
     const prismSliders = {
         angle: document.getElementById('prism-angle'),
         ray: document.getElementById('prism-ray-count'),
-        rayVal: document.getElementById('prism-ray-count-val')
+        rayVal: document.getElementById('prism-ray-count-val'),
+        width: document.getElementById('prism-width')
     };
 
     /**
      * Renders chromatic dispersion by tracking physical hits step-by-step.
-     * Prevents overdraw by splitting wavelengths only after droplet entry.
      */
     function drawPrismSimulation() {
         ctxPrism.globalCompositeOperation = 'source-over';
         ctxPrism.clearRect(0, 0, canvasPrism.width, canvasPrism.height);
 
-        // Normalize slider input [-20, 20] to [-1.0, 1.0] for geometric targeting
+        // Normalize angle slider input [-20, 20] to [-1.0, 1.0] for geometric targeting
         const sliderVal = parseFloat(prismSliders.angle?.value || -5);
         const normalizedOffset = sliderVal / 20.0;
+
+        // Retrieve beam width value [1, 100]
+        const widthVal = parseFloat(prismSliders.width?.value || 50);
 
         const config = {
             rayCount: parseInt(prismSliders.ray?.value || 1, 10)
@@ -85,32 +89,32 @@ export function initPrismSimulation() {
 
         const lightDir = { x: 1, y: 0 };
 
-        // Map offset to physical drop radius. Invert Y so positive slider values move up.
+        // Primary ray targeting. Positive values shift the beam upward.
         const targetOffset = -normalizedOffset * dropRadius * 0.95;
 
-        // Limit maximum beam spread to 40% of the radius to maintain visual clarity
-        const beamWidth = (config.rayCount === 1) ? 0 : (config.rayCount / 300) * dropRadius * 0.4;
+        // Map beam width: 100 corresponds to a full droplet diameter
+        const beamWidth = (config.rayCount === 1) ? 0 : (widthVal / 100.0) * (dropRadius * 2);
 
-        // Independent alpha scaling based on ray density to prevent white blowout
+        // Independent alpha scaling based on ray density to prevent visual blowout
         const incidentAlpha = Math.max(0.02, 1.0 / config.rayCount).toFixed(3);
         const colorAlpha = Math.max(0.08, 4.0 / config.rayCount).toFixed(3);
         const secondaryAlpha = Math.max(0.02, 1.5 / config.rayCount).toFixed(3);
 
         const wavelengths = [
-            { r: 255, g: 30,  b: 30,  ior: 1.320 },
-            { r: 255, g: 150, b: 0,   ior: 1.325 },
-            { r: 255, g: 255, b: 0,   ior: 1.330 },
-            { r: 0,   g: 255, b: 0,   ior: 1.335 },
-            { r: 0,   g: 150, b: 255, ior: 1.340 },
-            { r: 150, g: 0,   b: 255, ior: 1.345 }
+            { r: 255, g: 30,  b: 30,  ior: 1.320 }, // Red
+            { r: 255, g: 150, b: 0,   ior: 1.325 }, // Orange
+            { r: 255, g: 255, b: 0,   ior: 1.330 }, // Yellow
+            { r: 0,   g: 255, b: 0,   ior: 1.335 }, // Green
+            { r: 0,   g: 150, b: 255, ior: 1.340 }, // Blue
+            { r: 150, g: 0,   b: 255, ior: 1.345 }  // Violet
         ];
 
-        // Outer loop iterates through spatial rays to draw incident light once per coordinate
+        // Outer loop iterates through incident spatial light rays
         for (let i = 0; i < config.rayCount; i++) {
             const t = config.rayCount > 1 ? (i / (config.rayCount - 1)) - 0.5 : 0;
             const currentOffset = targetOffset + t * beamWidth;
 
-            // Discard rays outside the droplet boundaries
+            // Discard rays that physically miss the droplet boundaries
             if (Math.abs(currentOffset) >= dropRadius * 0.99) continue;
 
             let rayPos = { x: dropCenter.x - 500, y: dropCenter.y + currentOffset };
@@ -120,7 +124,7 @@ export function initPrismSimulation() {
 
             const hit1 = MathUtils.add(rayPos, MathUtils.mul(lightDir, t1));
 
-            // Render pure white incident ray (No additive blending to prevent glare)
+            // Render pure white incident ray (source-over to prevent additive glare)
             ctxPrism.globalCompositeOperation = 'source-over';
             ctxPrism.beginPath();
             ctxPrism.moveTo(rayPos.x, rayPos.y);
@@ -134,7 +138,7 @@ export function initPrismSimulation() {
             // Switch to additive blending for internal spectrum separation
             ctxPrism.globalCompositeOperation = 'lighter';
 
-            // Inner loop computes dispersion specific to each wavelength
+            // Inner loop computes chromatic dispersion specific to each wavelength
             for (let c = 0; c < wavelengths.length; c++) {
                 const channel = wavelengths[c];
                 ctxPrism.strokeStyle = `rgba(${channel.r}, ${channel.g}, ${channel.b}, ${colorAlpha})`;
@@ -142,7 +146,7 @@ export function initPrismSimulation() {
                 const dir1 = MathUtils.refract(lightDir, normal1, 1.0 / channel.ior);
                 if (!dir1) continue;
 
-                // Phase 1: Internal propagation to back wall
+                // Phase 1: Internal propagation to the back wall
                 const startInside1 = MathUtils.add(hit1, MathUtils.mul(dir1, 0.01));
                 const t2 = MathUtils.intersectCircle(startInside1, dir1, dropCenter, dropRadius);
                 if (!t2) continue;
@@ -167,7 +171,7 @@ export function initPrismSimulation() {
                 ctxPrism.lineTo(hit3.x, hit3.y);
                 ctxPrism.stroke();
 
-                // Phase 3: Primary rainbow exit
+                // Phase 3: Primary rainbow exit (Transmittance)
                 const normal3_in = MathUtils.normalize(MathUtils.sub(dropCenter, hit3));
                 const primaryExitDir = MathUtils.refract(dir2, normal3_in, channel.ior / 1.0);
 
@@ -179,7 +183,7 @@ export function initPrismSimulation() {
                     ctxPrism.stroke();
                 }
 
-                // Phase 4: Secondary internal reflection and rainbow
+                // Phase 4: Secondary internal reflection and rainbow exit (Reflectance)
                 const dir3 = MathUtils.reflect(dir2, normal3_in);
                 const startInside3 = MathUtils.add(hit3, MathUtils.mul(dir3, 0.01));
                 const t4 = MathUtils.intersectCircle(startInside3, dir3, dropCenter, dropRadius);
@@ -187,6 +191,7 @@ export function initPrismSimulation() {
                 if (t4) {
                     const hit4 = MathUtils.add(startInside3, MathUtils.mul(dir3, t4));
 
+                    // Artificial attenuation to simulate Fresnel reflection energy loss
                     ctxPrism.strokeStyle = `rgba(${channel.r}, ${channel.g}, ${channel.b}, ${secondaryAlpha})`;
                     ctxPrism.beginPath();
                     ctxPrism.moveTo(hit3.x, hit3.y);
@@ -221,9 +226,11 @@ export function initPrismSimulation() {
         drawPrismSimulation();
     }
 
+    // Attach event listeners to UI controls
     ['input'].forEach(evt => {
         prismSliders.angle?.addEventListener(evt, updatePrismUI);
         prismSliders.ray?.addEventListener(evt, updatePrismUI);
+        prismSliders.width?.addEventListener(evt, updatePrismUI);
     });
 
     drawPrismSimulation();

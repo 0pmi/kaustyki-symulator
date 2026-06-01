@@ -36,8 +36,8 @@ export default class Environment {
 
         /* PERFORMANCE NOTE: Shadow map resolution is the primary performance bottleneck here.
            Drop this to 1024 or 512 for a massive framerate boost on lower-end mobile devices. */
-        this.sunLight.shadow.mapSize.width = 2048;
-        this.sunLight.shadow.mapSize.height = 2048;
+        this.sunLight.shadow.mapSize.width = 512;
+        this.sunLight.shadow.mapSize.height = 512;
 
         const bound = this.poolSize * 1.15;
         this.sunLight.shadow.camera.left = -bound;

@@ -13,7 +13,7 @@ export default class CausticsGenerator {
      * @param {number} poolSize - Spatial dimensions of the projection target.
      * @param {number} resolution - Texture resolution for the baked caustics map.
      */
-    constructor(renderer, poolSize = 10, resolution = 1024) {
+    constructor(renderer, poolSize = 10, resolution = 512) {
         this.renderer = renderer;
         this.poolSize = poolSize;
         this.resolution = resolution;
