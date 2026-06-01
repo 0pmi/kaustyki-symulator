@@ -15,29 +15,75 @@ import { initLensSimulation } from './simulators/lens.js';
 import { initCupSimulation } from './simulators/cup.js';
 import { initPrismSimulation } from './simulators/prism.js';
 
-// Utils
+// Utilities
 import { isHardwareAcceleratedWebGLAvailable, renderWebGLFallback } from './utils/webglCheck.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Load localization data (Polish by default)
-    const i18n = new I18n('pl');
-    await i18n.loadTranslations('pl');
+    // 1. Initialize Localization (I18n)
+    // Retrieve the user's preferred language from local storage, defaulting to Polish
+    const savedLang = localStorage.getItem('appLang') || 'pl';
+    const i18n = new I18n(savedLang);
 
-    // 2. Initialize UI components and 2D simulators
+    // Load translation data and initially populate the DOM
+    await i18n.loadTranslations(savedLang);
+
+    // 2. Setup Language Switcher UI
+    const btnPl = document.getElementById('lang-pl');
+    const btnEn = document.getElementById('lang-en');
+
+    // Apply the initial active state to the language toggle buttons
+    if (savedLang === 'en') {
+        btnEn?.classList.add('active');
+        btnPl?.classList.remove('active');
+    } else {
+        btnPl?.classList.add('active');
+        btnEn?.classList.remove('active');
+    }
+
+    /**
+     * Handles the language switching mechanism.
+     * Updates local storage, fetches new translations, and refreshes the UI.
+     * @param {string} targetLang - The target language code ('pl' or 'en')
+     */
+    const switchLanguage = async (targetLang) => {
+        if (i18n.lang === targetLang) return; // Prevent redundant network requests and DOM updates
+
+        localStorage.setItem('appLang', targetLang);
+
+        // The loadTranslations method internally handles fetching the JSON and triggering DOM updates
+        await i18n.loadTranslations(targetLang);
+
+        // Update active states on the UI buttons
+        if (targetLang === 'pl') {
+            btnPl?.classList.add('active');
+            btnEn?.classList.remove('active');
+        } else {
+            btnEn?.classList.add('active');
+            btnPl?.classList.remove('active');
+        }
+    };
+
+    // Attach event listeners to the language switch buttons
+    btnPl?.addEventListener('click', () => switchLanguage('pl'));
+    btnEn?.addEventListener('click', () => switchLanguage('en'));
+
+    // 3. Initialize UI Components and 2D Simulators
     initLightbox();
     initSnellSimulation();
     initLensSimulation();
     initCupSimulation();
     initPrismSimulation();
 
-    // 3. Initialize Advanced 3D Caustics and Fluid Simulation Environment
+    // 4. Initialize Advanced 3D Caustics and Fluid Simulation Environment
     const container = document.getElementById('three-container');
     if (container) {
-        // Hardware acceleration safety gate
+        // Hardware acceleration safety gate to prevent software rendering lockups
         if (!isHardwareAcceleratedWebGLAvailable()) {
             renderWebGLFallback(container);
+            // Force an immediate translation update on the newly injected fallback DOM elements
             i18n.updateDOM();
         } else {
+            // Proceed with heavy WebGL initialization only if a capable GPU is detected
             const app = new SimulationApp(container, i18n);
             app.start();
         }

@@ -1,0 +1,111 @@
+{
+  "meta": {
+    "title": "Caustics"
+  },
+  "intro": {
+    "title": "Optics and Caustics",
+    "subtitle": "Interactive Optical Laboratory",
+    "galleryTitle": "Inspirations: Caustics in Nature",
+    "gallerySource": "Image source:",
+    "whatIsCaustic": "<strong>What exactly is a caustic?</strong> Contrary to what it might seem, it is not a physical object, but rather a \"light architecture\". Derived from the Greek word <em>kaustikos</em> meaning \"burning\", it is an optical phenomenon involving the formation of bright, sharp patterns from concentrated light rays. They occur when light refracts or reflects off curved surfaces, intersecting and accumulating energy in characteristic envelopes."
+  },
+  "snell": {
+    "title": "1. Refraction (Snell's Law)",
+    "theory": "<p>Refraction is a fundamental phenomenon in geometrical optics. When a light wave passes through the boundary between two media of different optical densities, its propagation speed and direction change. The physical quantity characterizing a given medium is the index of refraction $n$ (IOR).</p><p>The mathematical model of this phenomenon is defined by <strong>Snell's Law</strong>:</p>$$n_1 \\sin(\\theta_1) = n_2 \\sin(\\theta_2)$$<p>Where $n_1$ and $n_2$ denote the refractive indices of the respective media, while $\\theta_1$ and $\\theta_2$ are the angles of incidence and refraction, measured relative to the normal axis (a line perpendicular to the boundary surface).</p>",
+    "controls": {
+      "title": "Media Parameters",
+      "angle": "Angle of Incidence ($\\theta_1$): ",
+      "ior1": "Upper Medium ($n_1$): ",
+      "ior2": "Lower Medium ($n_2$): "
+    },
+    "table": {
+      "mat": "Material",
+      "ior": "Index (IOR)",
+      "v1": "Vacuum / Air",
+      "v2": "Ice",
+      "v3": "Water",
+      "v4": "Crown Glass (Typical)",
+      "v5": "Flint Glass (Dense)",
+      "v6": "Diamond"
+    },
+    "descTitle": "Phenomenon Analysis: Refraction and Internal Reflection",
+    "descList": "<p>The phenomenon of refraction and reflection can be analyzed by modifying the optical density of the media and the angle of incidence of the light wave:</p><p>&#8226; <strong>Refraction geometry:</strong> The passage of a ray from a less dense to a more optically dense medium (e.g., air &rarr; glass) causes the ray to bend toward the normal. In the reverse situation, the ray bends away from the normal.</p><p>&#8226; <strong>Total Internal Reflection (TIR):</strong> When light passes from a denser to a less dense medium, there is a critical angle of incidence beyond which refraction becomes impossible. The light is then 100% reflected from the boundary of the media, behaving as if in contact with a perfect mirror. This phenomenon is the basis for the operation of modern optical fibers.</p>"
+  },
+  "lens": {
+    "title": "2. Focusing (Lens)",
+    "theory": "<p>Idealized optical models assume that lenses focus parallel beams of rays into a single, precise point called the focal point. In reality, spherical lenses exhibit an optical defect known as <strong>spherical aberration</strong>.</p><p>Light rays falling on the peripheral areas of the lens (further from the optical axis) strike the surface at a greater angle. According to Snell's law, they undergo stronger refraction than rays traveling closer to the center. As a result, the common focal point becomes blurred, and the intersecting rays form a characteristic luminous envelope on the plane – a refractive caustic.</p>",
+    "controls": {
+      "title": "Simulation Parameters",
+      "lightY": "Light Position Y: ",
+      "rayCount": "Ray Count: ",
+      "ior": "Index of Refraction (IOR): "
+    },
+    "table": {
+      "mat": "Material",
+      "ior": "IOR Value",
+      "v1": "Air",
+      "v2": "Water",
+      "v3": "Olive Oil",
+      "v4": "Glass (Crown)",
+      "v5": "Sapphire",
+      "v6": "Diamond"
+    },
+    "descTitle": "Phenomenon Analysis: Spherical Aberration",
+    "descList": "<p>The optical properties of a spherical lens depend directly on its geometry and the material used:</p><p>&#8226; <strong>Caustic curve:</strong> The lack of a common focal point for all rays makes it impossible to obtain a sharp image. The light intensity distribution forms a noticeable envelope, the shape of which depends on the lens parameters.</p><p>&#8226; <strong>Dependence on optical density:</strong> Materials with a higher IOR (e.g., diamond) exhibit stronger refractive properties. This results in shortening the focal length and shifting the caustic closer to the lens itself, unlike materials with a lower index (e.g., water).</p><p><strong>Assumptions and model simplifications:</strong><br>The simulation presents an idealized, smooth lens in a two-dimensional setup, using monochromatic (single-color) light. In reality, the use of white sunlight would lead to the superposition of another phenomenon – chromatic aberration (dispersion) – which would result in an additional, colorful blur at the edges of the caustic.</p>"
+  },
+  "cup": {
+    "title": "3. Reflection (Nephroid)",
+    "theory": "<p>Caustics are formed not only by refraction but also by reflection. This phenomenon is described by a simple rule: the angle of incidence equals the angle of reflection. In computer graphics, the reflected ray $\\vec{R}$ is calculated using the incident vector $\\vec{D}$ and the surface normal vector $\\vec{n}$:</p>$$\\vec{R} = \\vec{D} - 2(\\vec{D} \\cdot \\vec{n})\\vec{n}$$<p>Where the $\\cdot$ symbol denotes the dot product of vectors. Have you ever wondered where the luminous \"heart\" at the bottom of a coffee cup comes from when the sun shines on it? That is a reflective caustic. When parallel sunlight enters a cylindrical vessel, it does not focus into one ideal point. Instead, the rays reflect at different angles, intersecting with each other and creating a characteristic luminous pattern on the bottom. Mathematicians call this shape a nephroid (from the Greek nephros – kidney), and it is generated from just one simple vector equation.</p>",
+    "controls": {
+      "title": "Reflection Parameters",
+      "lightX": "Light Position X: ",
+      "rayCount": "Ray Count: "
+    },
+    "tip": "<strong>Do it yourself:</strong> Decrease the \"Ray Count\" slider to just a few. Analyze the path of each one individually – notice how they reflect off the wall maintaining the \"angle of incidence = angle of reflection\" rule. Then, smoothly increase their number. You will see how individual, intersecting lines arrange themselves into a continuous, dense curve – this is the exact moment a caustic is born!",
+    "descTitle": "How does it work in the browser?",
+    "descList": "The light angle slider simulates the sun's journey across the sky. When you move it, you change the angle of incidence of the entire wave front (represented by a set of parallel directional vectors).\n\nFor educational purposes, our 2D simulation uses one major simplification: we ignore the refraction of light upon entering the vessel. We treat the cup walls as completely transparent glass, focusing exclusively on the perfect, specular reflection of light when it hits the rear, concave edge. In the real world, this phenomenon looks slightly more \"blurred\" due to imperfections in the shape of the vessels and the additional refraction of light at the air-coffee interface."
+  },
+  "prism": {
+    "title": "4. Dispersion (Rainbow)",
+    "theory": "<p>To understand the rainbow, we must learn about the phenomenon of dispersion. The refractive index $n$ is not a constant – it depends on the wavelength of light $\\lambda$. Shorter waves (violet and blue) \"slow down\" in water slightly more and refract more strongly than long waves (red). This relationship is approximated by the empirical Cauchy's Equation:$$n(\\lambda)=A+\\frac{B}{\\lambda^2}$$Inside a raindrop, white sunlight enters (undergoing dispersion), reflects off its back wall, and exits, creating a colorful caustic at an angle of about 42 degrees. When this phenomenon occurs in millions of drops simultaneously, a rainbow arch lights up in the sky.</p>",
+    "controls": {
+      "title": "Dispersion Parameters",
+      "rayCount": "Ray Count: ",
+      "angle": "Angle of Incidence: ",
+      "medium": "Medium: <strong>Water (Raindrop)</strong>",
+      "width": "Beam Width",
+      "mediumDesc": "The refractive index for water is not a single number. It changes from 1.331 (for red light) to 1.343 (for violet light). It is precisely this minimal difference that creates the rainbow!"
+    },
+    "tip": "<strong>Do it yourself:</strong> Set the \"Ray Count\" slider to just a few. Then very slowly move the angle of incidence slider from left to right. You will notice that at one specific point, the blurred colors suddenly condense, forming a razor-sharp, separated beam. This is exactly where (at the angle of minimum deviation) the Descartes Ray is born!",
+    "descTitle": "Phenomenon Analysis: Anatomy of a Rainbow",
+    "descList": "<p>Increasing the number of rays to the maximum simulates full illumination of the drop. By examining different zones of light incidence, you can observe a full cross-section of optical phenomena:</p><p>&#8226; <strong>Bright background under the rainbow:</strong> Rays striking near the center of the drop pass through it and scatter. This explains why the sky under the primary rainbow arch always appears brighter.</p><p>&#8226; <strong>Primary rainbow:</strong> In the Descartes strike zone, the beam undergoes massive condensation after one internal reflection, creating a distinct, primary rainbow arch.</p><p>&#8226; <strong>Alexander's band:</strong> Between the primary and secondary rainbow zones, there is a range of angles from which no coherent rays return towards the observer. In the real sky (where the sun illuminates the entire drop at once), this phenomenon creates a distinct, dark band separating the two arches.</p><p>&#8226; <strong>Secondary rainbow:</strong> Light falling on the opposite part of the drop forms a beam with <em>reversed</em> colors (violet on top, red on the bottom). It is formed from a fraction of rays that managed to reflect inside the drop twice.</p><p><strong>Model simplifications and Cauchy's equation</strong><br>In the mathematical formula, constant $A$ is the base refractive index for a given medium, while $B$ is the so-called dispersion coefficient, which determines the strength of color separation. In real water, the difference in the $n$ value between red and violet colors is merely <strong>0.012</strong>, resulting in an angular separation only ~2 degrees wide. If hard physical data were implemented, the rainbow on the screen would be a thin thread difficult to spot.</p><p>In the presented model, the value of parameter $B$ was deliberately enlarged, artificially stretching the dispersion phenomenon. Thanks to this, the mechanism of separating individual wavelengths is immediately and clearly visible on the screen.</p>"
+  },
+  "gpu": {
+    "title": "5. Global Illumination and Caustics (3D Simulation)",
+    "theory": "<p>Previous models relied on analytically tracking the geometry of individual rays in an isolated 2D system. In a three-dimensional environment, optical phenomena become incomparably more complex. The boundary between media (e.g., water surface) is rarely perfectly flat – it is a dynamic structure. Every single wave acts as an asymmetrical, fluid lens that focuses and scatters passing light in a fraction of a second.</p><p>To recreate these behaviors in real time, it is necessary to account for the trajectories of countless rays. This phenomenon illustrates how elementary laws of optics, occurring en masse across the entire liquid surface, generate complex, multidimensional light structures.</p>",
+    "descTitle": "Phenomenon Analysis: Complex Optical Systems",
+    "descList": "<p>Recreating a 3D environment allows for the simultaneous observation of many optical phenomena discussed in previous sections:</p><p>&#8226; <strong>Dynamic refractive caustics:</strong> The rippled liquid surface acts as an infinite grid of moving microlenses. The phenomenon of spherical aberration (previously seen in a single lens) occurs massively here, creating a dense, constantly changing network of bright focal curves and dark, underexposed areas on the pool floor.</p><p>&#8226; <strong>Complex image refraction:</strong> The shape of a sphere submerged in water undergoes visual distortion. Light rays reflected from the object refract upon exiting the water at the uneven wave surface, in full compliance with the 3D application of Snell's Law.</p><p>&#8226; <strong>Chromatic aberration on the floor:</strong> Similar to the rainbow phenomenon, water exhibits a dependence of the refractive index on the wavelength of light. This results in dispersion at the edges of focused light beams (especially noticeable on the brightest caustic bands), generating characteristic, colorful fringes.</p><p>&#8226; <strong>Computational optimization:</strong> Physically correct tracking of millions of photons (Ray Tracing / Path Tracing) is an extremely demanding process for logic systems. In interactive 3D applications, these effects are simulated using specialized shading programs (shaders), which utilize the parallel power of GPUs to calculate approximate light paths and generate caustic textures in a matter of milliseconds.</p>",
+    "fallbackTitle": "3D Simulation Unavailable",
+    "fallbackDesc1": "Your browser does not support hardware graphics acceleration (WebGL) or it is disabled. The simulation has been blocked to prevent freezing your computer.",
+    "fallbackDesc2": "Try enabling hardware acceleration in your browser settings.",
+    "guiTitle": "Simulation Parameters",
+    "lightFolder": "Lighting & Shadows",
+    "ambientShadow": "Shadow Density",
+    "sunElev": "Sun Elevation",
+    "sunAzim": "Sun Angle (Azimuth)",
+    "sunInt": "Sun Intensity",
+    "opticsFolder": "Water Optics",
+    "ior": "Index of Refraction (IOR)",
+    "volFolder": "Water Color (Absorption)",
+    "absR": "Red",
+    "absG": "Green",
+    "absB": "Blue",
+    "sphereFolder": "Ball Physics",
+    "buoyancy": "Buoyancy Force",
+    "btnLight": "Set Sun to Camera (L)",
+    "btnGravity": "Toggle Gravity (G)",
+    "radius": "Ball Size",
+    "btnPause": "Pause / Resume (P)"
+  },
+  "footer": "Project created for the Physics course at the Faculty of Information and Communication Technology, PWr. MIT License 2026. Author: Krzysztof Cyran"
+}

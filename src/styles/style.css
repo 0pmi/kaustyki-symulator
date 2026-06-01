@@ -303,3 +303,33 @@ footer {
     font-size: 0.9em;
     margin-top: 15px;
 }
+
+/* Language switch */
+
+.lang-switcher {
+    display: flex;
+    gap: 5px;
+}
+
+.lang-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ccc;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.lang-btn:hover {
+    border-color: #fff;
+    color: #fff;
+}
+
+.lang-btn.active {
+    background: #4a90e2;
+    color: #fff;
+    border-color: #4a90e2;
+    font-weight: bold;
+}
