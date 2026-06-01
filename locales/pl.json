@@ -105,7 +105,10 @@
     "btnLight": "Ustaw Słońce na Kamerę (L)",
     "btnGravity": "Przełącz Grawitację (G)",
     "radius": "Rozmiar Piłki",
-    "btnPause": "Pauza / Wznowienie (P)"
+    "btnPause": "Pauza / Wznowienie (P)",
+    "perfFallbackTitle": "Wykryto Przeciążenie Sprzętu",
+    "perfFallbackDesc1": "Symulacja 3D została wstrzymana. Twoja karta graficzna napotkała trudności z płynnym renderowaniem fizyki płynów i zjawisk optycznych w czasie rzeczywistym.",
+    "perfFallbackDesc2": "Twoja przeglądarka najprawdopodobniej używa zintegrowanej karty graficznej zamiast dedykowanego układu. Spróbuj wymusić wysoką wydajność dla przeglądarki w ustawieniach systemu operacyjnego."
   },
   "footer": "Projekt stworzony w ramach wykładu Fizyka na wydziale Informatyki i Telekomunikacji PWr. Licencja MIT 2026. Autor: Krzysztof Cyran"
 }
