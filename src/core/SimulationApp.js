@@ -618,9 +618,34 @@ export default class SimulationApp {
     }
 
     /**
-     * Ignites the internal rendering loops managed by the Engine component.
+     * Pre-compiles GLSL shaders to prevent main-thread freezing on integrated GPUs,
+     * hides the loading screen, and ignites the internal rendering loop.
      */
-    start() {
-        this.engine.start();
+    async start() {
+        const loader = document.getElementById('simulation-loader');
+
+        try {
+            // Wait a tiny bit to ensure the DOM paints the loading screen first
+            await new Promise(resolve => setTimeout(resolve, 50));
+
+            // Force asynchronous compilation of all materials currently in the main scene.
+            if (this.engine.renderer.compileAsync) {
+                await this.engine.renderer.compileAsync(this.engine.scene, this.engine.camera);
+            } else {
+                // Fallback for older Three.js versions
+                this.engine.renderer.compile(this.engine.scene, this.engine.camera);
+            }
+
+        } catch (error) {
+            console.warn("Pre-compilation skipped or failed:", error);
+        } finally {
+            // Smoothly fade out the loading screen
+            if (loader) {
+                loader.classList.add('hidden');
+            }
+
+            // Start the actual animation loop safely
+            this.engine.start();
+        }
     }
 }

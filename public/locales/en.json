@@ -108,7 +108,8 @@
     "btnPause": "Pause / Resume (P)",
     "perfFallbackTitle": "Hardware Overload Detected",
     "perfFallbackDesc1": "The 3D simulation has been halted. Your graphics card struggled to smoothly render fluid physics and optical phenomena in real-time.",
-    "perfFallbackDesc2": "Your browser is most likely using an integrated graphics chip instead of a dedicated GPU. Try forcing high performance for your browser in the OS graphics settings."
+    "perfFallbackDesc2": "Your browser is most likely using an integrated graphics chip instead of a dedicated GPU. Try forcing high performance for your browser in the OS graphics settings.",
+    "loading": "Compiling shaders..."
   },
   "footer": "Project created for the Physics course at the Faculty of Information and Communication Technology, PWr. MIT License 2026. Author: Krzysztof Cyran"
 }
