@@ -15,6 +15,9 @@ import { initLensSimulation } from './simulators/lens.js';
 import { initCupSimulation } from './simulators/cup.js';
 import { initPrismSimulation } from './simulators/prism.js';
 
+// Utils
+import { isHardwareAcceleratedWebGLAvailable, renderWebGLFallback } from './utils/webglCheck.js';
+
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Load localization data (Polish by default)
     const i18n = new I18n('pl');
@@ -30,7 +33,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 3. Initialize Advanced 3D Caustics and Fluid Simulation Environment
     const container = document.getElementById('three-container');
     if (container) {
-        const app = new SimulationApp(container, i18n);
-        app.start();
+        // Hardware acceleration safety gate
+        if (!isHardwareAcceleratedWebGLAvailable()) {
+            renderWebGLFallback(container);
+            i18n.updateDOM();
+        } else {
+            const app = new SimulationApp(container, i18n);
+            app.start();
+        }
     }
 });

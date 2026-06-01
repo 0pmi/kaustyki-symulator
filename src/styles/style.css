@@ -272,3 +272,34 @@ footer {
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     }
 }
+
+/* 3D render not available warning window */
+.webgl-fallback-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    text-align: center;
+    padding: 20px;
+    font-family: inherit;
+}
+
+.webgl-fallback-title {
+    color: #ff4444;
+    margin-bottom: 10px;
+}
+
+.webgl-fallback-desc {
+    color: #cccccc;
+    max-width: 400px;
+    line-height: 1.5;
+}
+
+.webgl-fallback-hint {
+    color: #888888;
+    font-size: 0.9em;
+    margin-top: 15px;
+}
