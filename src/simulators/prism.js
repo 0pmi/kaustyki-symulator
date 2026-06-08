@@ -34,9 +34,21 @@ const MathUtils = {
         return null;
     },
     refract: (incident, normal, eta) => {
-        const cosi = -MathUtils.dot(incident, normal);
-        const sin2t = eta * eta * (1.0 - cosi * cosi);
-        if (sin2t > 1.0) return null; // Total Internal Reflection
+        let cosi = -MathUtils.dot(incident, normal);
+
+        // Zabezpieczenie przed błędem FP dla funkcji acos/sqrt
+        cosi = Math.max(-1.0, Math.min(1.0, cosi));
+
+        let sin2t = eta * eta * (1.0 - cosi * cosi);
+
+        // Zabezpieczenie na krawędzi kropli (Epsilon clamp)
+        // Jeśli przekroczyło 1.0 przez błąd procesora, wymuś 1.0.
+        if (sin2t > 1.0 && sin2t < 1.00001) {
+            sin2t = 1.0;
+        } else if (sin2t > 1.0) {
+            return null; // Faktyczne TIR
+        }
+
         const cost = Math.sqrt(1.0 - sin2t);
         return MathUtils.add(
             MathUtils.mul(incident, eta),
@@ -96,9 +108,10 @@ export function initPrismSimulation() {
         const beamWidth = (config.rayCount === 1) ? 0 : (widthVal / 100.0) * (dropRadius * 2);
 
         // Independent alpha scaling based on ray density to prevent visual blowout
-        const incidentAlpha = Math.max(0.02, 1.0 / config.rayCount).toFixed(3);
-        const colorAlpha = Math.max(0.08, 4.0 / config.rayCount).toFixed(3);
-        const secondaryAlpha = Math.max(0.02, 1.5 / config.rayCount).toFixed(3);
+        const densityFactor = 1.0 + (widthVal / 20.0);
+        const incidentAlpha = Math.min(1.0, (1.0 / config.rayCount) * densityFactor).toFixed(3);
+        const colorAlpha = Math.min(1.0, (4.0 / config.rayCount) * densityFactor).toFixed(3);
+        const secondaryAlpha = Math.min(1.0, (1.5 / config.rayCount) * densityFactor).toFixed(3);
 
         const wavelengths = [
             { r: 255, g: 30,  b: 30,  ior: 1.320 }, // Red

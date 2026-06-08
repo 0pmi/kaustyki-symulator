@@ -17,6 +17,7 @@ import { initPrismSimulation } from './simulators/prism.js';
 
 // Utilities
 import { isHardwareAcceleratedWebGLAvailable, renderWebGLFallback } from './utils/webglCheck.js';
+import {initFresnelSimulation} from "./simulators/fresnel_sim.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Initialize Localization (I18n)
@@ -52,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // The loadTranslations method internally handles fetching the JSON and triggering DOM updates
         await i18n.loadTranslations(targetLang);
-
+        window.dispatchEvent(new Event('languageChanged'));
         // Update active states on the UI buttons
         if (targetLang === 'pl') {
             btnPl?.classList.add('active');
@@ -73,6 +74,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     initLensSimulation();
     initCupSimulation();
     initPrismSimulation();
+    initFresnelSimulation();
+    initFresnelSimulation(i18n);
 
 // 4. Initialize Advanced 3D Caustics and Fluid Simulation Environment
     const container = document.getElementById('three-container');

@@ -158,7 +158,10 @@ export function initLensSimulation() {
 
             if (t1) {
                 const hit1 = MathUtils.add(rayPos, MathUtils.mul(rayDir, t1));
-
+                const distToC2 = MathUtils.mag(MathUtils.sub(hit1, C2));
+                if (distToC2 > lensRadius + 0.001) {
+                    continue;
+                }
                 // Draw incoming ray
                 ctxLens.beginPath();
                 ctxLens.moveTo(rayPos.x, rayPos.y);
@@ -175,7 +178,10 @@ export function initLensSimulation() {
 
                     if (t2) {
                         const hit2 = MathUtils.add(hit1, MathUtils.mul(refractedDir1, t2));
-
+                        const distToC1 = MathUtils.mag(MathUtils.sub(hit2, C1));
+                        if (distToC1 > lensRadius + 0.001) {
+                            continue;
+                        }
                         // Draw internal ray
                         ctxLens.beginPath();
                         ctxLens.moveTo(hit1.x, hit1.y);
